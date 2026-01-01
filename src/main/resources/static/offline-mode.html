@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Mode - Music App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-top: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .offline-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .song-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .song-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .song-info {
+            display: flex;
+            align-items: center;
+        }
+        .song-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 15px;
+            width: 40px;
+            text-align: center;
+        }
+        .song-details {
+            flex: 1;
+        }
+        .song-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .song-artist {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .song-duration {
+            color: #999;
+            font-size: 0.9rem;
+        }
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: #667eea;
+            color: white;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: scale(1.1);
+        }
+        .progress-container {
+            background: #e0e0e0;
+            height: 6px;
+            border-radius: 3px;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+        .progress-bar {
+            background: #667eea;
+            height: 100%;
+            width: 30%;
+            border-radius: 3px;
+        }
+        .stats-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .stats-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="offline-icon">
+                <i class="fas fa-wifi-slash"></i>
+            </div>
+            <h1>Offline Mode</h1>
+            <p class="text-muted">Play your cached and downloaded music without internet connection</p>
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle"></i> You're currently offline. All features available!
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalSongs">12</div>
+                    <div class="stats-label">Total Songs</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalSize">245</div>
+                    <div class="stats-label">MB Storage Used</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="playTime">8.5</div>
+                    <div class="stats-label">Hours Playtime</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <h3><i class="fas fa-music"></i> Your Offline Library</h3>
+                
+                <div id="offlineSongs">
+                    <!-- Songs will be loaded here -->
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <h3><i class="fas fa-headphones"></i> Now Playing</h3>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-compact-disc fa-4x text-primary"></i>
+                        </div>
+                        <h5 id="nowPlayingTitle">No song selected</h5>
+                        <p id="nowPlayingArtist" class="text-muted">Select a song to play</p>
+                        
+                        <div class="progress-container mt-3" onclick="seekAudio(event)">
+                            <div class="progress-bar" id="progressBar"></div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span id="currentTime">0:00</span>
+                            <span id="totalTime">0:00</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center mt-4">
+                            <button class="control-btn me-3" onclick="previousSong()">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button class="control-btn me-3" id="playBtn" onclick="togglePlay()">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="control-btn" onclick="nextSong()">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button class="btn btn-outline-primary btn-sm me-2" onclick="shuffleSongs()">
+                                <i class="fas fa-random"></i> Shuffle
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="clearOfflineCache()">
+                                <i class="fas fa-trash"></i> Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5><i class="fas fa-info-circle"></i> Offline Tips</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success"></i> Songs downloaded for offline play
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success"></i> No internet required
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success"></i> Battery optimized
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-sync"></i> Auto-sync when online
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample offline songs data
+        const offlineSongs = [
+            { id: 1, title: "Blinding Lights", artist: "The Weeknd", duration: "3:20", size: "8.2 MB" },
+            { id: 2, title: "Save Your Tears", artist: "The Weeknd", duration: "3:35", size: "8.5 MB" },
+            { id: 3, title: "Levitating", artist: "Dua Lipa", duration: "3:23", size: "7.9 MB" },
+            { id: 4, title: "Stay", artist: "The Kid LAROI, Justin Bieber", duration: "2:21", size: "5.8 MB" },
+            { id: 5, title: "Good 4 U", artist: "Olivia Rodrigo", duration: "2:58", size: "7.1 MB" },
+            { id: 6, title: "Heat Waves", artist: "Glass Animals", duration: "3:58", size: "9.3 MB" },
+            { id: 7, title: "Industry Baby", artist: "Lil Nas X", duration: "3:32", size: "8.3 MB" },
+            { id: 8, title: "Easy On Me", artist: "Adele", duration: "3:44", size: "8.9 MB" }
+        ];
+
+        let currentSongIndex = -1;
+        let isPlaying = false;
+        let audioProgress = 0;
+        let audioInterval;
+
+        // Load offline songs
+        function loadOfflineSongs() {
+            const container = document.getElementById('offlineSongs');
+            container.innerHTML = '';
+            
+            offlineSongs.forEach((song, index) => {
+                const songCard = document.createElement('div');
+                songCard.className = 'song-card';
+                songCard.innerHTML = `
+                    <div class="song-info">
+                        <div class="song-number">${index + 1}</div>
+                        <div class="song-details">
+                            <div class="song-title">${song.title}</div>
+                            <div class="song-artist">${song.artist}</div>
+                        </div>
+                        <div class="song-duration">${song.duration}</div>
+                        <button class="btn btn-sm btn-outline-primary ms-3" onclick="playSong(${index})">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(songCard);
+            });
+            
+            // Update stats
+            document.getElementById('totalSongs').textContent = offlineSongs.length;
+            document.getElementById('totalSize').textContent = 
+                offlineSongs.reduce((sum, song) => sum + parseFloat(song.size), 0).toFixed(1);
+        }
+
+        // Play a song
+        function playSong(index) {
+            currentSongIndex = index;
+            const song = offlineSongs[index];
+            
+            document.getElementById('nowPlayingTitle').textContent = song.title;
+            document.getElementById('nowPlayingArtist').textContent = song.artist;
+            
+            // Convert duration to seconds
+            const [minutes, seconds] = song.duration.split(':').map(Number);
+            const totalSeconds = minutes * 60 + seconds;
+            document.getElementById('totalTime').textContent = song.duration;
+            
+            // Start playback simulation
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            isPlaying = true;
+            
+            // Simulate audio progress
+            if (audioInterval) clearInterval(audioInterval);
+            
+            let currentSeconds = 0;
+            audioInterval = setInterval(() => {
+                if (currentSeconds >= totalSeconds) {
+                    nextSong();
+                    return;
+                }
+                
+                currentSeconds++;
+                audioProgress = (currentSeconds / totalSeconds) * 100;
+                
+                document.getElementById('progressBar').style.width = `${audioProgress}%`;
+                
+                // Format current time
+                const mins = Math.floor(currentSeconds / 60);
+                const secs = currentSeconds % 60;
+                document.getElementById('currentTime').textContent = 
+                    `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }, 1000);
+        }
+
+        // Toggle play/pause
+        function togglePlay() {
+            const playBtn = document.getElementById('playBtn');
+            
+            if (currentSongIndex === -1) {
+                playSong(0);
+                return;
+            }
+            
+            if (isPlaying) {
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                clearInterval(audioInterval);
+            } else {
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                // Resume progress simulation
+                const song = offlineSongs[currentSongIndex];
+                const [minutes, seconds] = song.duration.split(':').map(Number);
+                const totalSeconds = minutes * 60 + seconds;
+                const currentSeconds = Math.floor((audioProgress / 100) * totalSeconds);
+                
+                audioInterval = setInterval(() => {
+                    // Progress simulation logic
+                }, 1000);
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // Next song
+        function nextSong() {
+            if (currentSongIndex < offlineSongs.length - 1) {
+                playSong(currentSongIndex + 1);
+            } else {
+                playSong(0);
+            }
+        }
+
+        // Previous song
+        function previousSong() {
+            if (currentSongIndex > 0) {
+                playSong(currentSongIndex - 1);
+            } else {
+                playSong(offlineSongs.length - 1);
+            }
+        }
+
+        // Shuffle songs
+        function shuffleSongs() {
+            for (let i = offlineSongs.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [offlineSongs[i], offlineSongs[j]] = [offlineSongs[j], offlineSongs[i]];
+            }
+            loadOfflineSongs();
+            alert('Songs shuffled!');
+        }
+
+        // Seek audio
+        function seekAudio(event) {
+            const progressContainer = event.currentTarget;
+            const rect = progressContainer.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const width = rect.width;
+            const percentage = (x / width) * 100;
+            
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            audioProgress = percentage;
+        }
+
+        // Clear offline cache
+        function clearOfflineCache() {
+            if (confirm('Are you sure you want to clear all offline songs?')) {
+                document.getElementById('offlineSongs').innerHTML = 
+                    '<div class="alert alert-info">No offline songs. Go online and download some!</div>';
+                document.getElementById('totalSongs').textContent = '0';
+                document.getElementById('totalSize').textContent = '0';
+                document.getElementById('playTime').textContent = '0';
+                
+                // Reset player
+                document.getElementById('nowPlayingTitle').textContent = 'No song selected';
+                document.getElementById('nowPlayingArtist').textContent = 'Select a song to play';
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('currentTime').textContent = '0:00';
+                
+                clearInterval(audioInterval);
+                currentSongIndex = -1;
+                isPlaying = false;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOfflineSongs();
+            
+            // Simulate playtime calculation
+            const totalMinutes = offlineSongs.reduce((sum, song) => {
+                const [mins, secs] = song.duration.split(':').map(Number);
+                return sum + mins + (secs / 60);
+            }, 0);
+            document.getElementById('playTime').textContent = (totalMinutes / 60).toFixed(1);
+        });
+    </script>
+</body>
+</html>

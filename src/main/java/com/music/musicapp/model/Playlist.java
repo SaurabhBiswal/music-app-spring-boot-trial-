@@ -2,16 +2,13 @@ package com.music.musicapp.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "playlists")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Playlist {
     
     @Id
@@ -21,17 +18,16 @@ public class Playlist {
     @Column(nullable = false)
     private String name;
     
+    @Column(length = 1000)
     private String description;
     
-    @Column(name = "created_at")
-    private String createdAt;
+    @Column(name = "is_public", nullable = false)
+    private boolean isPublic = true;
     
-    // Many playlists belong to one user
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
     
-    // Many-to-many relationship with songs
     @ManyToMany
     @JoinTable(
         name = "playlist_songs",
@@ -40,27 +36,24 @@ public class Playlist {
     )
     private List<Song> songs = new ArrayList<>();
     
-    // Constructor without id and songs list
-    public Playlist(String name, String description, User user) {
-        this.name = name;
-        this.description = description;
-        this.user = user;
-        this.createdAt = java.time.LocalDateTime.now().toString();
-        this.songs = new ArrayList<>();
+    // Users who follow this playlist (FIXED mappedBy)
+    @ManyToMany(mappedBy = "followedPlaylists")
+    private List<User> followers = new ArrayList<>();
+    
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
     
-    // Helper method to add a song to playlist
-    public void addSong(Song song) {
-        this.songs.add(song);
-    }
-    
-    // Helper method to remove a song from playlist
-    public void removeSong(Song song) {
-        this.songs.remove(song);
-    }
-    
-    // Helper method to get song count
-    public int getSongCount() {
-        return this.songs.size();
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

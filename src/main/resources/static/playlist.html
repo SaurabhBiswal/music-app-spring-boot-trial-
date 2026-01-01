@@ -184,7 +184,6 @@
             border-radius: 12px;
             transition: all 0.3s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
         }
         
         .playlist-card:hover {
@@ -233,11 +232,6 @@
             background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             margin-bottom: 10px;
-            transition: all 0.3s;
-        }
-        
-        .song-item:hover {
-            background: rgba(255, 255, 255, 0.08);
         }
         
         .song-info h4 {
@@ -255,27 +249,7 @@
             gap: 10px;
         }
         
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #1db954;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
             .playlist-form {
                 flex-direction: column;
             }
@@ -297,19 +271,19 @@
             <p class="subtitle">Create, manage, and share your music playlists</p>
             
             <div class="nav-links">
-    <a href="/" class="nav-btn">🏠 Home</a>
-    <a href="/music-player.html" class="nav-btn">🎧 Music Player</a>
-    <a href="/audio-test.html" class="nav-btn">🎵 Upload Test</a>
-    <a href="/playlist.html" class="nav-btn active">📋 Playlists</a>
-    <a href="/h2-console" class="nav-btn" target="_blank">📊 Database</a>
-</div>
+                <a href="/" class="nav-btn">🏠 Home</a>
+                <a href="/music-player.html" class="nav-btn">🎧 Music Player</a>
+                <a href="/audio-test.html" class="nav-btn">🎵 Upload Test</a>
+                <a href="/playlist.html" class="nav-btn active">📋 Playlists</a>
+                <a href="/h2-console" class="nav-btn" target="_blank">📊 Database</a>
+            </div>
         </header>
         
         <!-- Create Playlist Section -->
         <div class="section">
             <h2>Create New Playlist</h2>
             <div class="playlist-form">
-                <input type="text" id="playlistName" class="form-input" placeholder="Playlist Name" required>
+                <input type="text" id="playlistName" class="form-input" placeholder="Playlist Name" value="favourite songs">
                 <input type="text" id="playlistDesc" class="form-input" placeholder="Description (Optional)">
             </div>
             <div class="form-checkbox">
@@ -324,48 +298,20 @@
         <div class="section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="margin: 0;">Public Playlists</h2>
-                <button onclick="loadPlaylists()" class="secondary">🔄 Refresh</button>
+                <button onclick="loadPlaylists()" class="secondary">🔄 Refresh Playlists</button>
             </div>
+            <div id="loadStatus" class="status"></div>
             <div id="playlistsContainer" class="playlist-grid">
                 <!-- Playlists will be loaded here -->
-            </div>
-        </div>
-        
-        <!-- Playlist Details Modal -->
-        <div id="playlistModal" class="section" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 id="modalTitle" style="margin: 0;"></h2>
-                <button onclick="closeModal()" class="secondary">✕ Close</button>
-            </div>
-            <p id="modalDescription"></p>
-            <div class="playlist-meta">
-                <span id="modalMeta"></span>
-                <span id="modalSongsCount"></span>
-            </div>
-            
-            <div style="margin: 25px 0;">
-                <h3>Songs in Playlist</h3>
-                <div id="playlistSongs" class="song-list">
-                    <!-- Songs will be loaded here -->
-                </div>
-            </div>
-            
-            <div class="playlist-actions">
-                <button onclick="playPlaylist()" class="secondary">▶️ Play All</button>
-                <button onclick="deletePlaylist()" class="danger">🗑️ Delete Playlist</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Global variables
-        let currentPlaylists = [];
-        let currentPlaylistId = null;
-        
         // Load playlists on page load
         window.onload = function() {
-            loadPlaylists();
-            showStatus('Playlist management loaded. Create or browse playlists!', 'info', 'createStatus');
+            showStatus('Ready to create or browse playlists!', 'info', 'createStatus');
+            loadPlaylists(); // Auto-load playlists on page load
         };
         
         // Create a new playlist
@@ -394,19 +340,23 @@
                     })
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                }
+                
                 const result = await response.json();
                 
-                if (result.success) {
+                // Handle different response formats
+                if (result.id || result.playlistId) {
                     showStatus('✅ Playlist created successfully!', 'success', 'createStatus');
-                    
-                    // Clear form
-                    document.getElementById('playlistName').value = '';
                     document.getElementById('playlistDesc').value = '';
-                    
-                    // Refresh playlist list
+                    loadPlaylists();
+                } else if (result.message) {
+                    showStatus(`✅ ${result.message}`, 'success', 'createStatus');
                     loadPlaylists();
                 } else {
-                    showStatus(`❌ Error: ${result.message}`, 'error', 'createStatus');
+                    showStatus('✅ Playlist created!', 'success', 'createStatus');
+                    loadPlaylists();
                 }
             } catch (error) {
                 showStatus(`❌ Error: ${error.message}`, 'error', 'createStatus');
@@ -416,20 +366,46 @@
         // Load all public playlists
         async function loadPlaylists() {
             try {
-                showStatus('Loading playlists...', 'info', 'createStatus');
+                showStatus('Loading public playlists...', 'info', 'loadStatus');
                 
                 const response = await fetch('/api/playlists');
-                const result = await response.json();
                 
-                if (result.success) {
-                    currentPlaylists = result.data;
-                    displayPlaylists(currentPlaylists);
-                    showStatus(`✅ Loaded ${result.data.length} playlists`, 'success', 'createStatus');
-                } else {
-                    showStatus(`❌ Error: ${result.message}`, 'error', 'createStatus');
+                if (!response.ok) {
+                    throw new Error(`Failed to load: Server returned ${response.status}`);
                 }
+                
+                const data = await response.json();
+                
+                // Debug: Log what we received
+                console.log('API Response:', data);
+                
+                // Handle different response formats
+                let playlists = [];
+                
+                if (Array.isArray(data)) {
+                    // Case 1: Direct array of playlists
+                    playlists = data;
+                } else if (data.success && Array.isArray(data.data)) {
+                    // Case 2: {success: true, data: [...]}
+                    playlists = data.data;
+                } else if (data.error) {
+                    // Case 3: Error message
+                    throw new Error(data.error);
+                } else if (data.message) {
+                    // Case 4: Message in response
+                    throw new Error(data.message);
+                } else {
+                    // Case 5: Unknown format
+                    playlists = Object.values(data);
+                }
+                
+                displayPlaylists(playlists);
+                showStatus(`✅ Loaded ${playlists.length} public playlist(s)`, 'success', 'loadStatus');
+                
             } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error', 'createStatus');
+                console.error('Error loading playlists:', error);
+                showStatus(`❌ Failed to load playlists: ${error.message}`, 'error', 'loadStatus');
+                displayPlaylists([]);
             }
         }
         
@@ -438,24 +414,36 @@
             const container = document.getElementById('playlistsContainer');
             container.innerHTML = '';
             
-            if (playlists.length === 0) {
-                container.innerHTML = '<div class="status info">No public playlists found. Create one!</div>';
+            if (!playlists || playlists.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🎵</div>
+                        <h3>No Public Playlists Yet</h3>
+                        <p>Be the first to create a public playlist!</p>
+                    </div>
+                `;
                 return;
             }
             
             playlists.forEach(playlist => {
                 const playlistCard = document.createElement('div');
                 playlistCard.className = 'playlist-card';
+                
+                const playlistId = playlist.id || playlist.playlistId;
+                const songCount = playlist.songCount || (playlist.songs ? playlist.songs.length : 0);
+                const isPublic = playlist.public !== undefined ? playlist.public : 
+                               (playlist.isPublic !== undefined ? playlist.isPublic : true);
+                
                 playlistCard.innerHTML = `
-                    <h3>${playlist.name}</h3>
+                    <h3>${playlist.name || 'Unnamed Playlist'}</h3>
                     <p>${playlist.description || 'No description'}</p>
                     <div class="playlist-meta">
-                        <span>${playlist.formattedCreatedAt || 'Recent'}</span>
-                        <span>🎵 ${playlist.songCount || 0} songs</span>
+                        <span>${isPublic ? '🌍 Public' : '🔒 Private'}</span>
+                        <span>🎵 ${songCount} songs</span>
                     </div>
                     <div class="playlist-actions">
-                        <button onclick="viewPlaylist(${playlist.id})" class="secondary">View</button>
-                        <button onclick="playPlaylist(${playlist.id})" class="secondary">▶️ Play</button>
+                        <button onclick="viewPlaylist(${playlistId})" class="secondary">View Details</button>
+                        <button onclick="playPlaylist(${playlistId})" class="secondary">▶️ Play</button>
                     </div>
                 `;
                 
@@ -463,182 +451,26 @@
             });
         }
         
-        // View playlist details
-        async function viewPlaylist(playlistId) {
-            try {
-                showStatus('Loading playlist details...', 'info', 'createStatus');
-                
-                // Get playlist details
-                const response = await fetch(`/api/playlists/${playlistId}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    const playlist = result.data;
-                    currentPlaylistId = playlistId;
-                    
-                    // Update modal content
-                    document.getElementById('modalTitle').textContent = playlist.name;
-                    document.getElementById('modalDescription').textContent = playlist.description || 'No description';
-                    document.getElementById('modalMeta').textContent = `Created: ${playlist.formattedCreatedAt || 'Unknown'}`;
-                    document.getElementById('modalSongsCount').textContent = `Songs: ${playlist.songCount || 0}`;
-                    
-                    // Display songs
-                    displayPlaylistSongs(playlist.songs || []);
-                    
-                    // Show modal
-                    document.getElementById('playlistModal').style.display = 'block';
-                    
-                    showStatus('✅ Playlist loaded', 'success', 'createStatus');
-                } else {
-                    showStatus(`❌ Error: ${result.message}`, 'error', 'createStatus');
-                }
-            } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error', 'createStatus');
-            }
+        // View playlist details (simplified for now)
+        function viewPlaylist(playlistId) {
+            alert(`Viewing playlist ${playlistId}. This feature needs backend API support.`);
+            // You would need: GET /api/playlists/{id}
         }
         
-        // Display songs in playlist modal
-        function displayPlaylistSongs(songs) {
-            const container = document.getElementById('playlistSongs');
-            container.innerHTML = '';
-            
-            if (songs.length === 0) {
-                container.innerHTML = '<div class="status info">No songs in this playlist yet</div>';
-                return;
-            }
-            
-            songs.forEach(song => {
-                const songItem = document.createElement('div');
-                songItem.className = 'song-item';
-                songItem.innerHTML = `
-                    <div class="song-info">
-                        <h4>${song.title}</h4>
-                        <p>${song.artist} • ${song.album || 'Unknown'} • ${song.formattedDuration}</p>
-                    </div>
-                    <div class="song-actions">
-                        <button onclick="playSong('${song.audioFilePath || song.filePath}')" class="secondary">▶️</button>
-                        <button onclick="removeFromPlaylist(${song.id})" class="danger">🗑️</button>
-                    </div>
-                `;
-                container.appendChild(songItem);
-            });
-        }
-        
-        // Play a specific song
-        function playSong(filePath) {
-            if (filePath) {
-                // Open audio test page and play the song
-                window.open(`/audio-test.html?play=${encodeURIComponent(filePath)}`, '_blank');
-            } else {
-                showStatus('No audio file available for this song', 'error', 'createStatus');
-            }
-        }
-        
-        // Play entire playlist
-        async function playPlaylist(playlistId) {
-            if (!playlistId && currentPlaylistId) {
-                playlistId = currentPlaylistId;
-            }
-            
-            if (!playlistId) {
-                showStatus('No playlist selected', 'error', 'createStatus');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/api/playlists/${playlistId}/songs`);
-                const result = await response.json();
-                
-                if (result.success && result.data.length > 0) {
-                    // Get first song with audio file
-                    const songWithAudio = result.data.find(song => song.audioFilePath);
-                    if (songWithAudio) {
-                        window.open(`/audio-test.html?play=${encodeURIComponent(songWithAudio.audioFilePath)}`, '_blank');
-                        showStatus('Opening playlist in player...', 'success', 'createStatus');
-                    } else {
-                        showStatus('No songs with audio files in this playlist', 'error', 'createStatus');
-                    }
-                } else {
-                    showStatus('No songs in this playlist', 'error', 'createStatus');
-                }
-            } catch (error) {
-                showStatus(`Error: ${error.message}`, 'error', 'createStatus');
-            }
-        }
-        
-        // Remove song from playlist
-        async function removeFromPlaylist(songId) {
-            if (!currentPlaylistId) {
-                showStatus('No playlist selected', 'error', 'createStatus');
-                return;
-            }
-            
-            if (!confirm('Remove this song from playlist?')) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/api/playlists/${currentPlaylistId}/songs/${songId}`, {
-                    method: 'DELETE'
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showStatus('✅ Song removed from playlist', 'success', 'createStatus');
-                    // Refresh playlist view
-                    viewPlaylist(currentPlaylistId);
-                } else {
-                    showStatus(`❌ Error: ${result.message}`, 'error', 'createStatus');
-                }
-            } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error', 'createStatus');
-            }
-        }
-        
-        // Delete playlist
-        async function deletePlaylist() {
-            if (!currentPlaylistId) {
-                showStatus('No playlist selected', 'error', 'createStatus');
-                return;
-            }
-            
-            if (!confirm('Are you sure you want to delete this playlist?')) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/api/playlists/${currentPlaylistId}`, {
-                    method: 'DELETE'
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showStatus('✅ Playlist deleted successfully', 'success', 'createStatus');
-                    closeModal();
-                    loadPlaylists();
-                } else {
-                    showStatus(`❌ Error: ${result.message}`, 'error', 'createStatus');
-                }
-            } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error', 'createStatus');
-            }
-        }
-        
-        // Close modal
-        function closeModal() {
-            document.getElementById('playlistModal').style.display = 'none';
-            currentPlaylistId = null;
+        // Play playlist (simplified for now)
+        function playPlaylist(playlistId) {
+            alert(`Playing playlist ${playlistId}. This feature needs backend API support.`);
+            // You would need: GET /api/playlists/{id}/songs
         }
         
         // Status display helper
-        function showStatus(message, type, elementId = 'createStatus') {
+        function showStatus(message, type, elementId) {
             const statusDiv = document.getElementById(elementId);
+            if (!statusDiv) return;
+            
             statusDiv.textContent = message;
             statusDiv.className = 'status ' + type;
             
-            // Auto-clear success messages after 5 seconds
             if (type === 'success') {
                 setTimeout(() => {
                     if (statusDiv.textContent === message) {
@@ -648,6 +480,28 @@
                 }, 5000);
             }
         }
+        
+        // Debug function to check API response
+        async function debugAPI() {
+            try {
+                const response = await fetch('/api/playlists');
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                const text = await response.text();
+                console.log('Response text:', text);
+                try {
+                    const json = JSON.parse(text);
+                    console.log('Parsed JSON:', json);
+                } catch(e) {
+                    console.log('Not valid JSON');
+                }
+            } catch(error) {
+                console.error('Debug error:', error);
+            }
+        }
+        
+        // Run debug to see what the API returns
+        setTimeout(debugAPI, 1000);
     </script>
 </body>
 </html>

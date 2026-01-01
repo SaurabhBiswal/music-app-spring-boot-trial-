@@ -66,15 +66,22 @@ public class UserController {
     // Get all users (for testing only - remove in production)
     @GetMapping("/all")
     public ResponseEntity<ApiResponse> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
-        return ResponseEntity.ok(
-            ApiResponse.success("Users retrieved successfully", users)
-        );
+        try {
+            List<UserDTO> users = userService.getAllUsers();
+            return ResponseEntity.ok(
+                ApiResponse.success("Users retrieved successfully", users)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(ApiResponse.error("Error getting users: " + e.getMessage()));
+        }
     }
     
     // Health check endpoint
     @GetMapping("/health")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("User API is working!");
+    public ResponseEntity<ApiResponse> healthCheck() {
+        return ResponseEntity.ok(
+            ApiResponse.success("User API is working!", null)
+        );
     }
 }

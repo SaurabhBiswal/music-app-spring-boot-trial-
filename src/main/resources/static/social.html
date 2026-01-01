@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social - MusicHub Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2C3E50, #4A6491, #2C3E50);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #3498DB, #2ECC71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(52, 152, 219, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, #3498DB, #2ECC71);
+        }
+        
+        /* Profile Section */
+        .profile-section {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .profile-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498DB, #2ECC71);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .profile-name {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .profile-bio {
+            color: #b3b3b3;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498DB;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* Activity Feed */
+        .activity-feed {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feed-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2ECC71;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+        
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498DB, #2ECC71);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-user {
+            font-weight: bold;
+            color: #3498DB;
+            margin-right: 5px;
+        }
+        
+        .activity-action {
+            color: #b3b3b3;
+        }
+        
+        .activity-target {
+            color: #2ECC71;
+            font-weight: bold;
+        }
+        
+        .activity-time {
+            color: #888;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        /* Ratings & Reviews */
+        .ratings-section {
+            margin-bottom: 40px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: #3498DB;
+        }
+        
+        .ratings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .rating-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .rating-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .rating-track {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .rating-stars {
+            color: #FFD700;
+            font-size: 14px;
+        }
+        
+        .rating-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .user-avatar-small {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498DB, #2ECC71);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .review-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2ECC71;
+        }
+        
+        .review-content {
+            color: #b3b3b3;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .rating-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .helpful-btn {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498DB;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+        }
+        
+        /* Share Section */
+        .share-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .share-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .share-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .facebook-btn {
+            background: #1877F2;
+            color: white;
+        }
+        
+        .twitter-btn {
+            background: #1DA1F2;
+            color: white;
+        }
+        
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+        }
+        
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-3px);
+            opacity: 0.9;
+        }
+        
+        /* Friends Section */
+        .friends-section {
+            margin-bottom: 40px;
+        }
+        
+        .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .friend-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .friend-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .friend-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498DB, #2ECC71);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+        
+        .friend-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .friend-status {
+            color: #2ECC71;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .friend-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Status Messages */
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .success {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ECC71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            color: #E74C3C;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .info {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498DB;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        /* Loading Spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #b3b3b3;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3498DB;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .profile-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .ratings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .friends-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .share-options {
+                flex-direction: column;
+            }
+            
+            .share-btn {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👥 Music Social Hub</h1>
+            <p class="subtitle">
+                Connect with music lovers, share your favorite tracks, read and write reviews,
+                and discover what your friends are listening to.
+            </p>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-btn">🏠 Home</a>
+                <a href="/music-player.html" class="nav-btn">🎧 Music Player</a>
+                <a href="/discover.html" class="nav-btn">🔍 Discover</a>
+                <a href="/podcast.html" class="nav-btn">🎙 Podcasts</a>
+                <a href="/recommendations.html" class="nav-btn">✨ Recommendations</a>
+                <a href="/social.html" class="nav-btn active">👥 Social</a>
+                <a href="/import.html" class="nav-btn">📥 Import</a>
+                <a href="/offline.html" class="nav-btn">💾 Offline</a>
+            </div>
+        </header>
+        
+        <!-- User Profile Section -->
+        <div class="profile-section">
+            <div class="profile-card">
+                <div class="profile-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2 class="profile-name" id="userName">Music Explorer</h2>
+                <p class="profile-bio" id="userBio">Love discovering new music and sharing finds with friends!</p>
+                
+                <div class="profile-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="followersCount">128</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="followingCount">64</div>
+                        <div class="stat-label">Following</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="reviewsCount">42</div>
+                        <div class="stat-label">Reviews</div>
+                    </div>
+                </div>
+                
+                <div class="profile-actions">
+                    <button class="nav-btn" onclick="editProfile()" 
+                            style="background: linear-gradient(135deg, #3498DB, #2ECC71);">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                    <button class="nav-btn" onclick="shareProfile()">
+                        <i class="fas fa-share-alt"></i> Share Profile
+                    </button>
+                </div>
+            </div>
+            
+            <div class="activity-feed">
+                <h3 class="feed-title">
+                    <i class="fas fa-rss"></i> Recent Activity
+                </h3>
+                
+                <div id="activityFeed">
+                    <!-- Activity items will be loaded here -->
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="nav-btn" onclick="loadMoreActivity()">
+                        <i class="fas fa-sync-alt"></i> Load More
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ratings & Reviews Section -->
+        <div class="ratings-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-star"></i> Recent Reviews
+                </h2>
+                <button class="nav-btn" onclick="writeReview()"
+                        style="background: linear-gradient(135deg, #3498DB, #2ECC71);">
+                    <i class="fas fa-pen"></i> Write Review
+                </button>
+            </div>
+            
+            <div id="reviewsContainer" class="ratings-grid">
+                <!-- Reviews will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Share Music Section -->
+        <div class="share-section">
+            <h2 class="section-title">
+                <i class="fas fa-share-alt"></i> Share Your Music
+            </h2>
+            <p style="color: #b3b3b3; margin-bottom: 20px;">
+                Share your favorite tracks with friends on social media
+            </p>
+            
+            <div class="search-box" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" 
+                       id="shareSearch" 
+                       class="search-input" 
+                       placeholder="Search track to share..."
+                       style="flex: 1; padding: 12px;">
+                <button class="nav-btn" onclick="searchTrackToShare()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            
+            <div id="shareTrackInfo" style="display: none; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
+                    <img id="shareTrackImage" src="" alt="" style="width: 60px; height: 60px; border-radius: 8px;">
+                    <div>
+                        <div id="shareTrackTitle" style="font-weight: bold;"></div>
+                        <div id="shareTrackArtist" style="color: #888;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="share-options">
+                <button class="share-btn facebook-btn" onclick="shareOnFacebook()">
+                    <i class="fab fa-facebook-f"></i> Facebook
+                </button>
+                <button class="share-btn twitter-btn" onclick="shareOnTwitter()">
+                    <i class="fab fa-twitter"></i> Twitter
+                </button>
+                <button class="share-btn whatsapp-btn" onclick="shareOnWhatsApp()">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="share-btn copy-btn" onclick="copyShareLink()">
+                    <i class="fas fa-link"></i> Copy Link
+                </button>
+            </div>
+        </div>
+        
+        <!-- Friends Section -->
+        <div class="friends-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-user-friends"></i> Music Friends
+                </h2>
+                <button class="nav-btn" onclick="findFriends()">
+                    <i class="fas fa-search"></i> Find Friends
+                </button>
+            </div>
+            
+            <div id="friendsContainer" class="friends-grid">
+                <!-- Friends will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Status Messages -->
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading social data...</p>
+        </div>
+    </div>
+
+    <script>
+        let userId = localStorage.getItem('userId') || '1';
+        let currentTrackToShare = null;
+        
+        // Load social data on page load
+        window.onload = function() {
+            loadUserProfile();
+            loadActivityFeed();
+            loadRecentReviews();
+            loadFriends();
+        };
+        
+        // Load user profile - UPDATED TO USE REAL API
+        async function loadUserProfile() {
+            try {
+                const response = await fetch(`/api/social/profile/${userId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const profile = result.data;
+                    document.getElementById('userName').textContent = profile.username || 'Music Explorer';
+                    document.getElementById('userBio').textContent = profile.bio || 'Love discovering new music!';
+                    document.getElementById('followersCount').textContent = profile.followerCount || '128';
+                    document.getElementById('followingCount').textContent = profile.followingCount || '64';
+                    document.getElementById('reviewsCount').textContent = profile.reviewCount || '42';
+                    
+                    // Set avatar initials
+                    const avatar = document.getElementById('userAvatar');
+                    const initials = profile.username ? profile.username.charAt(0).toUpperCase() : 'M';
+                    avatar.innerHTML = `<span style="font-size: 40px; font-weight: bold;">${initials}</span>`;
+                } else {
+                    // Fallback to mock data if API fails
+                    console.warn('API failed, using mock profile data');
+                    loadMockProfile();
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                loadMockProfile();
+            }
+        }
+        
+        // Load activity feed - UPDATED TO USE REAL API
+        async function loadActivityFeed() {
+            try {
+                const response = await fetch(`/api/social/activity/feed?userId=${userId}&limit=10`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayActivityFeed(result.data);
+                } else {
+                    // Fallback to mock data
+                    loadMockActivityFeed();
+                }
+            } catch (error) {
+                console.error('Error loading activity:', error);
+                loadMockActivityFeed();
+            }
+        }
+        
+        // Load recent reviews - UPDATED TO USE REAL API
+        async function loadRecentReviews() {
+            try {
+                const response = await fetch(`/api/social/reviews/recent?limit=4`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayReviews(result.data);
+                } else {
+                    loadMockReviews();
+                }
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+                loadMockReviews();
+            }
+        }
+        
+        // Load friends - UPDATED TO USE REAL API
+        async function loadFriends() {
+            try {
+                const response = await fetch(`/api/social/friends?userId=${userId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayFriends(result.data);
+                } else {
+                    loadMockFriends();
+                }
+            } catch (error) {
+                console.error('Error loading friends:', error);
+                loadMockFriends();
+            }
+        }
+        
+        // Display activity feed
+        function displayActivityFeed(activities) {
+            const container = document.getElementById('activityFeed');
+            container.innerHTML = '';
+            
+            activities.forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item';
+                
+                activityItem.innerHTML = `
+                    <div class="activity-avatar">
+                        ${activity.avatar || activity.username?.charAt(0) || 'U'}
+                    </div>
+                    <div class="activity-content">
+                        <div>
+                            <span class="activity-user">${activity.username || activity.user || 'User'}</span>
+                            <span class="activity-action">${activity.activityType || activity.action || 'did something'}</span>
+                            <span class="activity-target">${activity.targetName || activity.target || ''}</span>
+                            ${activity.details ? `<span>${activity.details}</span>` : ''}
+                        </div>
+                        <div class="activity-time">
+                            <i class="far fa-clock"></i> ${activity.timeAgo || activity.time || 'Recently'}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(activityItem);
+            });
+        }
+        
+        // Load more activity
+        function loadMoreActivity() {
+            showLoading(true);
+            setTimeout(() => {
+                showStatus('Loaded more activity', 'success');
+                showLoading(false);
+            }, 1000);
+        }
+        
+        // Display reviews
+        function displayReviews(reviews) {
+            const container = document.getElementById('reviewsContainer');
+            container.innerHTML = '';
+            
+            reviews.forEach(review => {
+                const ratingCard = document.createElement('div');
+                ratingCard.className = 'rating-card';
+                
+                // Generate star rating
+                const stars = '★'.repeat(review.rating || 5) + '☆'.repeat(5 - (review.rating || 5));
+                
+                ratingCard.innerHTML = `
+                    <div class="rating-header">
+                        <div class="rating-track">${review.trackTitle || review.track || 'Unknown Track'}</div>
+                        <div class="rating-stars" title="${review.rating || 5} stars">${stars}</div>
+                    </div>
+                    
+                    <div class="rating-user">
+                        <div class="user-avatar-small">${review.user?.avatar || review.username?.charAt(0) || 'U'}</div>
+                        <div>
+                            <strong>${review.username || review.user?.name || 'User'}</strong>
+                            <div style="color: #888; font-size: 0.8rem;">${review.timeAgo || review.time || 'Recently'}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-title">${review.reviewTitle || review.title || 'Great Track!'}</div>
+                    <div class="review-content">${review.reviewContent || review.content || 'No review content available.'}</div>
+                    
+                    <div class="rating-footer">
+                        <div>
+                            ${review.artistName || review.artist || 'Unknown Artist'} • ${review.rating || 5}/5
+                        </div>
+                        <button class="helpful-btn" onclick="markHelpful(${review.id || '1'})">
+                            <i class="fas fa-thumbs-up"></i> Helpful (${review.helpfulCount || review.helpful || 0})
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(ratingCard);
+            });
+        }
+        
+        // Display friends
+        function displayFriends(friends) {
+            const container = document.getElementById('friendsContainer');
+            container.innerHTML = '';
+            
+            friends.forEach(friend => {
+                const friendCard = document.createElement('div');
+                friendCard.className = 'friend-card';
+                
+                friendCard.innerHTML = `
+                    <div class="friend-avatar">${friend.avatarUrl || friend.avatar || friend.username?.charAt(0) || 'F'}</div>
+                    <div class="friend-name">${friend.username || friend.name || 'Friend'}</div>
+                    <div class="friend-status">${friend.status || 'Listening to music'}</div>
+                    <div style="color: #888; font-size: 0.8rem; margin-bottom: 10px;">
+                        ${friend.mutual || 0} mutual friends
+                    </div>
+                    <div class="friend-actions">
+                        <button class="nav-btn" onclick="messageFriend(${friend.id || '1'})" style="font-size: 12px; padding: 8px 12px;">
+                            <i class="fas fa-comment"></i> Message
+                        </button>
+                        <button class="nav-btn" onclick="viewProfile(${friend.id || '1'})" style="font-size: 12px; padding: 8px 12px; background: rgba(255,255,255,0.1);">
+                            <i class="fas fa-eye"></i> Profile
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(friendCard);
+            });
+        }
+        
+        // Edit profile
+        function editProfile() {
+            const name = prompt('Enter your name:', document.getElementById('userName').textContent);
+            const bio = prompt('Enter your bio:', document.getElementById('userBio').textContent);
+            
+            if (name || bio) {
+                if (name) document.getElementById('userName').textContent = name;
+                if (bio) document.getElementById('userBio').textContent = bio;
+                
+                // Update avatar with new initials
+                const avatar = document.getElementById('userAvatar');
+                const initials = name ? name.charAt(0).toUpperCase() : 'M';
+                avatar.innerHTML = `<span style="font-size: 40px; font-weight: bold;">${initials}</span>`;
+                
+                showStatus('Profile updated!', 'success');
+                
+                // In production, you would send this to the API:
+                // fetch(`/api/social/profile/${userId}`, {
+                //     method: 'PUT',
+                //     headers: {'Content-Type': 'application/json'},
+                //     body: JSON.stringify({name, bio})
+                // });
+            }
+        }
+        
+        // Share profile
+        function shareProfile() {
+            const profileUrl = `https://musicapp.com/profile/${userId}`;
+            navigator.clipboard.writeText(profileUrl);
+            showStatus('Profile link copied to clipboard!', 'success');
+        }
+        
+        // Write review - UPDATED TO USE REAL API
+        function writeReview() {
+            const track = prompt('Enter track name:');
+            if (!track) return;
+            
+            const artist = prompt('Enter artist name:');
+            const rating = prompt('Enter rating (1-5 stars):', '5');
+            const title = prompt('Enter review title:');
+            const content = prompt('Enter review content:');
+            
+            if (track && rating && title) {
+                const reviewData = {
+                    trackId: track.toLowerCase().replace(/\s+/g, '_'),
+                    rating: parseFloat(rating),
+                    review: content,
+                    reviewTitle: title
+                };
+                
+                fetch('/api/social/ratings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Id': userId
+                    },
+                    body: JSON.stringify(reviewData)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        showStatus('Review submitted!', 'success');
+                        setTimeout(() => {
+                            loadRecentReviews(); // Refresh reviews
+                        }, 1000);
+                    } else {
+                        showStatus('Error: ' + result.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    showStatus('Error submitting review', 'error');
+                });
+            }
+        }
+        
+        // Mark review as helpful
+        function markHelpful(reviewId) {
+            const button = event.target.closest('.helpful-btn');
+            const currentText = button.textContent;
+            const match = currentText.match(/\((\d+)\)/);
+            const currentCount = match ? parseInt(match[1]) : 0;
+            
+            button.innerHTML = `<i class="fas fa-thumbs-up"></i> Helpful (${currentCount + 1})`;
+            button.style.background = 'rgba(46, 204, 113, 0.2)';
+            button.style.color = '#2ECC71';
+            
+            showStatus('Thanks for your feedback!', 'success');
+            
+            // In production, send to API:
+            // fetch(`/api/social/reviews/${reviewId}/helpful`, {
+            //     method: 'POST',
+            //     headers: {'X-User-Id': userId}
+            // });
+        }
+        
+        // Search track to share
+        async function searchTrackToShare() {
+            const query = document.getElementById('shareSearch').value.trim();
+            
+            if (!query) {
+                showStatus('Please enter a track name', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Search for tracks
+                const response = await fetch(`/api/discover/search?query=${encodeURIComponent(query)}&limit=5`);
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    const track = result.data[0];
+                    currentTrackToShare = {
+                        id: track.id,
+                        title: track.title,
+                        artist: track.artist,
+                        image: track.albumArt || track.thumbnail || 'https://via.placeholder.com/300/3498DB/ffffff?text=Music'
+                    };
+                    
+                    document.getElementById('shareTrackInfo').style.display = 'block';
+                    document.getElementById('shareTrackImage').src = currentTrackToShare.image;
+                    document.getElementById('shareTrackTitle').textContent = currentTrackToShare.title;
+                    document.getElementById('shareTrackArtist').textContent = currentTrackToShare.artist;
+                    
+                    showStatus(`Found "${query}"`, 'success');
+                } else {
+                    // Mock fallback
+                    currentTrackToShare = {
+                        id: 'share_' + Date.now(),
+                        title: query,
+                        artist: 'Various Artists',
+                        image: 'https://via.placeholder.com/300/3498DB/ffffff?text=' + encodeURIComponent(query.substring(0, 10))
+                    };
+                    
+                    document.getElementById('shareTrackInfo').style.display = 'block';
+                    document.getElementById('shareTrackImage').src = currentTrackToShare.image;
+                    document.getElementById('shareTrackTitle').textContent = currentTrackToShare.title;
+                    document.getElementById('shareTrackArtist').textContent = currentTrackToShare.artist;
+                    
+                    showStatus(`Mock result for "${query}"`, 'info');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Share on Facebook - UPDATED TO USE REAL API
+        function shareOnFacebook() {
+            if (!currentTrackToShare) {
+                showStatus('Please search for a track first', 'error');
+                return;
+            }
+            
+            const shareData = {
+                trackId: currentTrackToShare.id,
+                platform: 'facebook',
+                message: `Check out "${currentTrackToShare.title}" by ${currentTrackToShare.artist}`
+            };
+            
+            fetch('/api/social/share', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-User-Id': userId
+                },
+                body: JSON.stringify(shareData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    const shareUrl = result.data.shareUrls?.facebook || 
+                        `https://www.facebook.com/sharer/sharer.php?u=https://musicapp.com/track/${currentTrackToShare.id}`;
+                    window.open(shareUrl, '_blank');
+                    showStatus('Shared on Facebook!', 'success');
+                } else {
+                    // Fallback to direct sharing
+                    const url = `https://musicapp.com/track/${currentTrackToShare.id}`;
+                    const text = `Check out "${currentTrackToShare.title}" by ${currentTrackToShare.artist} on MusicHub!`;
+                    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
+                    window.open(shareUrl, '_blank');
+                    showStatus('Shared on Facebook!', 'success');
+                }
+            })
+            .catch(error => {
+                // Fallback on error
+                const url = `https://musicapp.com/track/${currentTrackToShare.id}`;
+                const text = `Check out "${currentTrackToShare.title}" by ${currentTrackToShare.artist} on MusicHub!`;
+                const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
+                window.open(shareUrl, '_blank');
+                showStatus('Shared on Facebook!', 'success');
+            });
+        }
+        
+        // Share on Twitter
+        function shareOnTwitter() {
+            if (!currentTrackToShare) {
+                showStatus('Please search for a track first', 'error');
+                return;
+            }
+            
+            const url = `https://musicapp.com/track/${currentTrackToShare.id}`;
+            const text = `Listening to "${currentTrackToShare.title}" by ${currentTrackToShare.artist} 🎵`;
+            const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+            
+            window.open(shareUrl, '_blank');
+            showStatus('Shared on Twitter!', 'success');
+        }
+        
+        // Share on WhatsApp
+        function shareOnWhatsApp() {
+            if (!currentTrackToShare) {
+                showStatus('Please search for a track first', 'error');
+                return;
+            }
+            
+            const url = `https://musicapp.com/track/${currentTrackToShare.id}`;
+            const text = `Check out this track: "${currentTrackToShare.title}" by ${currentTrackToShare.artist}\n${url}`;
+            const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            
+            window.open(shareUrl, '_blank');
+            showStatus('Shared on WhatsApp!', 'success');
+        }
+        
+        // Copy share link
+        function copyShareLink() {
+            if (!currentTrackToShare) {
+                showStatus('Please search for a track first', 'error');
+                return;
+            }
+            
+            const url = `https://musicapp.com/track/${currentTrackToShare.id}`;
+            navigator.clipboard.writeText(url);
+            showStatus('Link copied to clipboard!', 'success');
+        }
+        
+        // Message friend
+        function messageFriend(friendId) {
+            const message = prompt('Enter your message:');
+            if (message) {
+                showStatus('Message sent!', 'success');
+            }
+        }
+        
+        // View friend profile
+        function viewProfile(friendId) {
+            showStatus(`Loading profile...`, 'info');
+            // In production, navigate to friend's profile page
+            window.location.href = `/profile.html?id=${friendId}`;
+        }
+        
+        // Find friends
+        function findFriends() {
+            showStatus('Searching for music friends...', 'info');
+            setTimeout(() => {
+                showStatus('Found 3 new friends with similar taste!', 'success');
+            }, 2000);
+        }
+        
+        // ========== MOCK DATA FUNCTIONS (Fallback) ==========
+        
+        function loadMockProfile() {
+            document.getElementById('userName').textContent = 'Music Explorer';
+            document.getElementById('userBio').textContent = 'Love discovering new music and sharing finds with friends!';
+            document.getElementById('followersCount').textContent = '128';
+            document.getElementById('followingCount').textContent = '64';
+            document.getElementById('reviewsCount').textContent = '42';
+        }
+        
+        function loadMockActivityFeed() {
+            const activities = [
+                {
+                    user: 'musiclover42',
+                    action: 'rated',
+                    target: 'Blinding Lights by The Weeknd',
+                    rating: '★★★★★',
+                    time: '2 hours ago',
+                    avatar: 'ML'
+                },
+                {
+                    user: 'soundexplorer',
+                    action: 'shared',
+                    target: 'a new playlist',
+                    details: '"Chill Vibes"',
+                    time: '4 hours ago',
+                    avatar: 'SE'
+                },
+                {
+                    user: 'djpro',
+                    action: 'followed',
+                    target: 'you',
+                    time: 'Yesterday',
+                    avatar: 'DP'
+                },
+                {
+                    user: 'beatmaker',
+                    action: 'commented on',
+                    target: 'your review',
+                    details: '"Great insight!"',
+                    time: '2 days ago',
+                    avatar: 'BM'
+                },
+                {
+                    user: 'you',
+                    action: 'added',
+                    target: '3 new tracks',
+                    details: 'to "Workout Mix"',
+                    time: '3 days ago',
+                    avatar: 'ME'
+                }
+            ];
+            
+            displayActivityFeed(activities);
+        }
+        
+        function loadMockReviews() {
+            const reviews = [
+                {
+                    id: 1,
+                    user: {
+                        name: 'musiclover42',
+                        avatar: 'ML'
+                    },
+                    track: 'Blinding Lights',
+                    artist: 'The Weeknd',
+                    rating: 5,
+                    title: 'Absolute Banger!',
+                    content: 'This track never gets old. The production is incredible and the vocals are out of this world.',
+                    helpful: 24,
+                    time: '2 hours ago'
+                },
+                {
+                    id: 2,
+                    user: {
+                        name: 'soundexplorer',
+                        avatar: 'SE'
+                    },
+                    track: 'Bohemian Rhapsody',
+                    artist: 'Queen',
+                    rating: 5,
+                    title: 'Timeless Classic',
+                    content: 'A masterpiece that defined a generation. Every time I listen, I discover something new.',
+                    helpful: 18,
+                    time: '1 day ago'
+                },
+                {
+                    id: 3,
+                    user: {
+                        name: 'djpro',
+                        avatar: 'DP'
+                    },
+                    track: 'Good 4 U',
+                    artist: 'Olivia Rodrigo',
+                    rating: 4,
+                    title: 'Great Pop Rock Revival',
+                    content: 'Love the early 2000s pop rock vibes. Olivia nailed this one!',
+                    helpful: 12,
+                    time: '2 days ago'
+                },
+                {
+                    id: 4,
+                    user: {
+                        name: 'beatmaker',
+                        avatar: 'BM'
+                    },
+                    track: 'Sicko Mode',
+                    artist: 'Travis Scott',
+                    rating: 5,
+                    title: 'Production Masterpiece',
+                    content: 'The beat switches are insane. One of the most creative hip-hop tracks in years.',
+                    helpful: 32,
+                    time: '3 days ago'
+                }
+            ];
+            
+            displayReviews(reviews);
+        }
+        
+        function loadMockFriends() {
+            const friends = [
+                {
+                    id: 1,
+                    name: 'musiclover42',
+                    status: 'Listening to Blinding Lights',
+                    avatar: 'ML',
+                    mutual: 12
+                },
+                {
+                    id: 2,
+                    name: 'soundexplorer',
+                    status: 'Online',
+                    avatar: 'SE',
+                    mutual: 8
+                },
+                {
+                    id: 3,
+                    name: 'djpro',
+                    status: 'DJing live now',
+                    avatar: 'DP',
+                    mutual: 15
+                },
+                {
+                    id: 4,
+                    name: 'beatmaker',
+                    status: 'Producing new track',
+                    avatar: 'BM',
+                    mutual: 6
+                },
+                {
+                    id: 5,
+                    name: 'audience',
+                    status: 'Exploring playlists',
+                    avatar: 'AU',
+                    mutual: 3
+                },
+                {
+                    id: 6,
+                    name: 'melodymaker',
+                    status: 'Offline',
+                    avatar: 'MM',
+                    mutual: 9
+                }
+            ];
+            
+            displayFriends(friends);
+        }
+        
+        // Helper functions
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+        
+        // Setup social event listeners
+        function setupSocialEventListeners() {
+            // Add Enter key support for search
+            document.getElementById('shareSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchTrackToShare();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

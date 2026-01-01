@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcasts - MusicHub Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #8A2BE2, #4B0082);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(138, 43, 226, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, #8A2BE2, #4B0082);
+        }
+        
+        /* Podcast Categories */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .category-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .category-card:hover {
+            background: rgba(138, 43, 226, 0.1);
+            transform: translateY(-5px);
+            border-color: rgba(138, 43, 226, 0.3);
+        }
+        
+        .category-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #8A2BE2;
+        }
+        
+        /* Podcast Grid */
+        .podcast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .podcast-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .podcast-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(138, 43, 226, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .podcast-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #8A2BE2, #4B0082);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .podcast-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .podcast-info {
+            padding: 20px;
+        }
+        
+        .podcast-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: white;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .podcast-publisher {
+            color: #b3b3b3;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .podcast-description {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .podcast-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 15px;
+        }
+        
+        .podcast-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .subscribe-btn {
+            background: linear-gradient(135deg, #8A2BE2, #4B0082);
+            color: white;
+        }
+        
+        .subscribe-btn:hover {
+            background: linear-gradient(135deg, #4B0082, #8A2BE2);
+            transform: scale(1.05);
+        }
+        
+        .episodes-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .episodes-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Episode List */
+        .episode-list {
+            margin-top: 30px;
+        }
+        
+        .episode-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        
+        .episode-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .episode-number {
+            background: rgba(138, 43, 226, 0.2);
+            color: #8A2BE2;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .episode-content {
+            flex: 1;
+        }
+        
+        .episode-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .episode-duration {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* Player */
+        .podcast-player {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .player-title {
+            font-weight: bold;
+            color: white;
+        }
+        
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .control-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 10px;
+        }
+        
+        .play-btn {
+            background: linear-gradient(135deg, #8A2BE2, #4B0082);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-bottom: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #8A2BE2, #4B0082);
+            border-radius: 2px;
+            width: 0%;
+        }
+        
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* Search & Filter */
+        .search-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, #8A2BE2, #4B0082);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        /* Status Messages */
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .success {
+            background: rgba(138, 43, 226, 0.2);
+            color: #8A2BE2;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+        
+        .error {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+        
+        .info {
+            background: rgba(13, 110, 253, 0.2);
+            color: #0d6efd;
+            border: 1px solid rgba(13, 110, 253, 0.3);
+        }
+        
+        /* Loading Spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #b3b3b3;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #8A2BE2;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .podcast-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎙 Discover Podcasts</h1>
+            <p class="subtitle">
+                Explore thousands of podcasts across all categories. Subscribe to your favorites,
+                download episodes for offline listening, and discover new shows every day.
+            </p>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-btn">🏠 Home</a>
+                <a href="/music-player.html" class="nav-btn">🎧 Music Player</a>
+                <a href="/discover.html" class="nav-btn">🔍 Discover</a>
+                <a href="/podcast.html" class="nav-btn active">🎙 Podcasts</a>
+                <a href="/recommendations.html" class="nav-btn">✨ Recommendations</a>
+                <a href="/social.html" class="nav-btn">👥 Social</a>
+                <a href="/import.html" class="nav-btn">📥 Import</a>
+                <a href="/offline.html" class="nav-btn">💾 Offline</a>
+            </div>
+        </header>
+        
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2 style="margin-bottom: 20px; color: #8A2BE2;">Search Podcasts</h2>
+            <div class="search-box">
+                <input type="text" 
+                       id="searchInput" 
+                       class="search-input" 
+                       placeholder="Search for podcasts, episodes, or topics..."
+                       onkeypress="if(event.keyCode==13) searchPodcasts()">
+                <button class="search-btn" onclick="searchPodcasts()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            
+            <!-- Categories -->
+            <h3 style="margin: 30px 0 20px; color: #8A2BE2;">Browse Categories</h3>
+            <div class="categories-grid" id="categoriesContainer">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Status Messages -->
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading podcasts...</p>
+        </div>
+        
+        <!-- Podcasts Grid -->
+        <div id="podcastsContainer" class="podcast-grid">
+            <!-- Podcasts will be loaded here -->
+        </div>
+        
+        <!-- Episode List (hidden by default) -->
+        <div id="episodeList" class="episode-list" style="display: none;">
+            <h3 style="margin-bottom: 20px; color: #8A2BE2;">
+                <span id="episodesTitle"></span>
+                <button onclick="hideEpisodes()" style="float: right; background: none; border: none; color: #888; cursor: pointer;">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </h3>
+            <div id="episodesContainer">
+                <!-- Episodes will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Featured Podcasts -->
+        <div style="margin-top: 50px;">
+            <h3 style="margin-bottom: 20px; color: #8A2BE2;">Featured Podcasts</h3>
+            <div class="podcast-grid" id="featuredContainer">
+                <!-- Featured podcasts will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Your Subscriptions -->
+        <div style="margin-top: 50px;">
+            <h3 style="margin-bottom: 20px; color: #8A2BE2;">
+                <i class="fas fa-heart"></i> Your Subscriptions
+            </h3>
+            <div class="podcast-grid" id="subscriptionsContainer">
+                <!-- Subscriptions will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Podcast Player -->
+    <div id="podcastPlayer" class="podcast-player">
+        <div class="player-header">
+            <div class="player-title" id="playerTitle">Now Playing</div>
+            <button onclick="closePlayer()" style="background: none; border: none; color: #888; cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="player-controls">
+            <button class="control-btn" onclick="skipBackward()">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button class="control-btn play-btn" id="playPauseBtn" onclick="togglePlay()">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="control-btn" onclick="skipForward()">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            
+            <div style="flex: 1; margin-left: 20px;">
+                <div class="progress-bar" onclick="seek(event)">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+            
+            <button class="control-btn" onclick="toggleMute()" style="margin-left: 20px;">
+                <i class="fas fa-volume-up"></i>
+            </button>
+            
+            <button class="control-btn" onclick="downloadEpisode()">
+                <i class="fas fa-download"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Audio Element -->
+    <audio id="audioPlayer" style="display: none;"></audio>
+
+    <script>
+        let currentPodcast = null;
+        let currentEpisodes = [];
+        let currentPlayingEpisode = null;
+        let isPlaying = false;
+        let userId = localStorage.getItem('userId') || '1';
+        
+        // Load categories on page load
+        window.onload = function() {
+            loadCategories();
+            loadFeaturedPodcasts();
+            loadSubscriptions();
+        };
+        
+        // Load podcast categories
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/podcasts/categories');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayCategories(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+        
+        // Display categories
+        function displayCategories(categories) {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = '';
+            
+            categories.forEach(category => {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'category-card';
+                categoryCard.onclick = () => searchByCategory(category.id);
+                
+                // Map category IDs to icons
+                const iconMap = {
+                    'technology': 'fas fa-microchip',
+                    'business': 'fas fa-briefcase',
+                    'comedy': 'fas fa-laugh',
+                    'education': 'fas fa-graduation-cap',
+                    'music': 'fas fa-music',
+                    'news': 'fas fa-newspaper',
+                    'sports': 'fas fa-football-ball',
+                    'truecrime': 'fas fa-search',
+                    'health': 'fas fa-heartbeat',
+                    'fiction': 'fas fa-book'
+                };
+                
+                categoryCard.innerHTML = `
+                    <div class="category-icon">
+                        <i class="${iconMap[category.id] || 'fas fa-podcast'}"></i>
+                    </div>
+                    <h4>${category.name}</h4>
+                    <p style="color: #888; font-size: 0.9rem;">${category.podcastCount || 0}+ podcasts</p>
+                `;
+                
+                container.appendChild(categoryCard);
+            });
+        }
+        
+        // Search podcasts
+        async function searchPodcasts() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                showStatus('Please enter a search term', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            showStatus(`Searching for "${query}"...`, 'info');
+            
+            try {
+                const response = await fetch(`/api/podcasts/search?query=${encodeURIComponent(query)}&limit=12`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayPodcasts(result.data);
+                    showStatus(`Found ${result.data.length} podcasts for "${query}"`, 'success');
+                } else {
+                    showStatus(`Search failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Search by category
+        async function searchByCategory(category) {
+            showLoading(true);
+            showStatus(`Loading ${category} podcasts...`, 'info');
+            
+            try {
+                const response = await fetch(`/api/podcasts/search?query=${category}&limit=12`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayPodcasts(result.data);
+                    showStatus(`Found ${result.data.length} ${category} podcasts`, 'success');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Display podcasts
+        function displayPodcasts(podcasts) {
+            const container = document.getElementById('podcastsContainer');
+            container.innerHTML = '';
+            
+            if (!podcasts || podcasts.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #b3b3b3;">
+                        <i class="fas fa-podcast" style="font-size: 60px; margin-bottom: 20px; opacity: 0.5;"></i>
+                        <h3 style="margin-bottom: 10px;">No podcasts found</h3>
+                        <p>Try a different search term or browse categories.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            podcasts.forEach((podcast, index) => {
+                const podcastCard = document.createElement('div');
+                podcastCard.className = 'podcast-card';
+                
+                podcastCard.innerHTML = `
+                    <div class="podcast-image">
+                        <img src="${podcast.thumbnail || podcast.image || 'https://via.placeholder.com/300/8A2BE2/ffffff?text=Podcast'}" 
+                             alt="${podcast.title}" 
+                             onerror="this.src='https://via.placeholder.com/300/8A2BE2/ffffff?text=Podcast'">
+                    </div>
+                    <div class="podcast-info">
+                        <div class="podcast-title" title="${podcast.title}">
+                            ${podcast.title}
+                        </div>
+                        <div class="podcast-publisher" title="${podcast.publisher || podcast.author || 'Unknown'}">
+                            ${podcast.publisher || podcast.author || 'Unknown Publisher'}
+                        </div>
+                        <div class="podcast-description">
+                            ${podcast.description || 'No description available.'}
+                        </div>
+                        <div class="podcast-meta">
+                            <span><i class="fas fa-headphones"></i> ${podcast.total_episodes || podcast.episodeCount || '?'} episodes</span>
+                            <span>${podcast.source || 'Unknown'}</span>
+                        </div>
+                        <div class="podcast-actions">
+                            <button class="action-btn subscribe-btn" onclick="subscribeToPodcast('${podcast.id}')">
+                                <i class="fas fa-plus"></i> Subscribe
+                            </button>
+                            <button class="action-btn episodes-btn" onclick="showEpisodes('${podcast.id}', '${podcast.title}')">
+                                <i class="fas fa-list"></i> Episodes
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(podcastCard);
+            });
+        }
+        
+        // Load featured podcasts
+        async function loadFeaturedPodcasts() {
+            try {
+                const response = await fetch('/api/podcasts/search?query=technology&limit=6');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayFeaturedPodcasts(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading featured:', error);
+            }
+        }
+        
+        // Display featured podcasts
+        function displayFeaturedPodcasts(podcasts) {
+            const container = document.getElementById('featuredContainer');
+            container.innerHTML = '';
+            
+            podcasts.forEach(podcast => {
+                const podcastCard = document.createElement('div');
+                podcastCard.className = 'podcast-card';
+                
+                podcastCard.innerHTML = `
+                    <div class="podcast-image">
+                        <img src="${podcast.thumbnail || 'https://via.placeholder.com/300/8A2BE2/ffffff?text=Podcast'}" 
+                             alt="${podcast.title}">
+                    </div>
+                    <div class="podcast-info">
+                        <div class="podcast-title">${podcast.title.substring(0, 30)}${podcast.title.length > 30 ? '...' : ''}</div>
+                        <div class="podcast-publisher">${podcast.publisher || 'Unknown'}</div>
+                        <div class="podcast-actions">
+                            <button class="action-btn subscribe-btn" onclick="subscribeToPodcast('${podcast.id}')" style="font-size: 12px; padding: 8px;">
+                                <i class="fas fa-play"></i> Listen Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(podcastCard);
+            });
+        }
+        
+        // Load subscriptions
+        async function loadSubscriptions() {
+            try {
+                const response = await fetch(`/api/podcasts/subscriptions?userId=${userId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displaySubscriptions(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading subscriptions:', error);
+            }
+        }
+        
+        // Display subscriptions
+        function displaySubscriptions(subscriptions) {
+            const container = document.getElementById('subscriptionsContainer');
+            
+            if (!subscriptions || subscriptions.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #b3b3b3;">
+                        <i class="fas fa-heart" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <h4 style="margin-bottom: 10px;">No subscriptions yet</h4>
+                        <p>Subscribe to podcasts to see them here.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            subscriptions.forEach(podcast => {
+                const podcastCard = document.createElement('div');
+                podcastCard.className = 'podcast-card';
+                
+                podcastCard.innerHTML = `
+                    <div class="podcast-image" style="height: 150px;">
+                        <img src="${podcast.image || 'https://via.placeholder.com/300/8A2BE2/ffffff?text=Subscribed'}" 
+                             alt="${podcast.title}">
+                    </div>
+                    <div class="podcast-info">
+                        <div class="podcast-title">${podcast.title}</div>
+                        <div class="podcast-publisher">${podcast.category || 'Podcast'}</div>
+                        <div class="podcast-meta">
+                            <span><i class="fas fa-calendar"></i> ${podcast.lastUpdated}</span>
+                        </div>
+                        <div class="podcast-actions">
+                            <button class="action-btn subscribe-btn" onclick="unsubscribe('${podcast.id}')" style="background: rgba(220, 53, 69, 0.2);">
+                                <i class="fas fa-times"></i> Unsubscribe
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(podcastCard);
+            });
+        }
+        
+        // Subscribe to podcast
+        async function subscribeToPodcast(podcastId) {
+            showStatus('Subscribing to podcast...', 'info');
+            
+            try {
+                const response = await fetch('/api/podcasts/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        podcastId: podcastId,
+                        userId: userId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('Subscribed successfully!', 'success');
+                    loadSubscriptions();
+                } else {
+                    showStatus(`Failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Unsubscribe
+        async function unsubscribe(podcastId) {
+            if (confirm('Are you sure you want to unsubscribe?')) {
+                showStatus('Unsubscribing...', 'info');
+                // In production, call unsubscribe API
+                setTimeout(() => {
+                    showStatus('Unsubscribed', 'success');
+                    loadSubscriptions();
+                }, 1000);
+            }
+        }
+        
+        // Show episodes for a podcast
+        async function showEpisodes(podcastId, podcastTitle) {
+            showLoading(true);
+            showStatus('Loading episodes...', 'info');
+            
+            try {
+                const response = await fetch(`/api/podcasts/${podcastId}/episodes?limit=20`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentPodcast = { id: podcastId, title: podcastTitle };
+                    currentEpisodes = result.data;
+                    
+                    document.getElementById('episodesTitle').textContent = `Episodes: ${podcastTitle}`;
+                    displayEpisodes(result.data);
+                    
+                    document.getElementById('episodeList').style.display = 'block';
+                    document.getElementById('podcastsContainer').style.display = 'none';
+                    document.getElementById('featuredContainer').style.display = 'none';
+                    document.getElementById('subscriptionsContainer').style.display = 'none';
+                    
+                    showStatus(`Loaded ${result.data.length} episodes`, 'success');
+                } else {
+                    showStatus(`Failed to load episodes: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Hide episodes
+        function hideEpisodes() {
+            document.getElementById('episodeList').style.display = 'none';
+            document.getElementById('podcastsContainer').style.display = 'grid';
+            document.getElementById('featuredContainer').style.display = 'grid';
+            document.getElementById('subscriptionsContainer').style.display = 'grid';
+        }
+        
+        // Display episodes
+        function displayEpisodes(episodes) {
+            const container = document.getElementById('episodesContainer');
+            container.innerHTML = '';
+            
+            episodes.forEach((episode, index) => {
+                const episodeItem = document.createElement('div');
+                episodeItem.className = 'episode-item';
+                
+                // Format duration
+                const duration = episode.duration || 1800;
+                const minutes = Math.floor(duration / 60);
+                const formattedDuration = `${minutes} min`;
+                
+                episodeItem.innerHTML = `
+                    <div class="episode-number">${index + 1}</div>
+                    <div class="episode-content">
+                        <div class="episode-title">${episode.title}</div>
+                        <div class="episode-description" style="color: #888; font-size: 0.9rem; margin-bottom: 5px;">
+                            ${episode.description || 'No description'}
+                        </div>
+                        <div class="episode-duration">
+                            <i class="far fa-clock"></i> ${formattedDuration} • 
+                            <i class="far fa-calendar"></i> ${episode.publishedDate || 'Unknown date'}
+                        </div>
+                    </div>
+                    <div class="episode-actions">
+                        <button class="action-btn" onclick="playEpisode(${index})" style="background: linear-gradient(135deg, #8A2BE2, #4B0082);">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="action-btn" onclick="downloadEpisode(${index})" style="background: rgba(255,255,255,0.1);">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(episodeItem);
+            });
+        }
+        
+        // Play episode
+        async function playEpisode(index) {
+            const episode = currentEpisodes[index];
+            currentPlayingEpisode = episode;
+            
+            // Show player
+            document.getElementById('podcastPlayer').style.display = 'block';
+            document.getElementById('playerTitle').textContent = episode.title;
+            
+            // Get stream URL
+            try {
+                const response = await fetch(`/api/podcasts/episodes/${episode.id}/stream`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const audio = document.getElementById('audioPlayer');
+                    audio.src = result.data.streamUrl || episode.audioUrl;
+                    audio.play();
+                    
+                    isPlaying = true;
+                    document.getElementById('playPauseBtn').innerHTML = '<i class="fas fa-pause"></i>';
+                    
+                    updateProgress();
+                } else {
+                    showStatus(`Streaming not available: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Toggle play/pause
+        function togglePlay() {
+            const audio = document.getElementById('audioPlayer');
+            const btn = document.getElementById('playPauseBtn');
+            
+            if (isPlaying) {
+                audio.pause();
+                btn.innerHTML = '<i class="fas fa-play"></i>';
+            } else {
+                audio.play();
+                btn.innerHTML = '<i class="fas fa-pause"></i>';
+            }
+            
+            isPlaying = !isPlaying;
+        }
+        
+        // Skip forward
+        function skipForward() {
+            const audio = document.getElementById('audioPlayer');
+            audio.currentTime += 30;
+        }
+        
+        // Skip backward
+        function skipBackward() {
+            const audio = document.getElementById('audioPlayer');
+            audio.currentTime -= 15;
+        }
+        
+        // Toggle mute
+        function toggleMute() {
+            const audio = document.getElementById('audioPlayer');
+            audio.muted = !audio.muted;
+        }
+        
+        // Seek in audio
+        function seek(event) {
+            const progressBar = document.querySelector('.progress-bar');
+            const audio = document.getElementById('audioPlayer');
+            const clickX = event.offsetX;
+            const width = progressBar.clientWidth;
+            const percentage = clickX / width;
+            
+            audio.currentTime = audio.duration * percentage;
+        }
+        
+        // Update progress bar
+        function updateProgress() {
+            const audio = document.getElementById('audioPlayer');
+            const progressBar = document.getElementById('progressBar');
+            const currentTimeEl = document.getElementById('currentTime');
+            const durationEl = document.getElementById('duration');
+            
+            audio.addEventListener('timeupdate', () => {
+                const currentTime = audio.currentTime;
+                const duration = audio.duration;
+                
+                if (duration) {
+                    const progress = (currentTime / duration) * 100;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    currentTimeEl.textContent = formatTime(currentTime);
+                    durationEl.textContent = formatTime(duration);
+                }
+            });
+            
+            audio.addEventListener('ended', () => {
+                isPlaying = false;
+                document.getElementById('playPauseBtn').innerHTML = '<i class="fas fa-play"></i>';
+            });
+        }
+        
+        // Format time (seconds to MM:SS)
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Close player
+        function closePlayer() {
+            document.getElementById('podcastPlayer').style.display = 'none';
+            const audio = document.getElementById('audioPlayer');
+            audio.pause();
+            isPlaying = false;
+        }
+        
+        // Download episode
+        async function downloadEpisode(index) {
+            let episode;
+            if (index !== undefined) {
+                episode = currentEpisodes[index];
+            } else if (currentPlayingEpisode) {
+                episode = currentPlayingEpisode;
+            } else {
+                showStatus('No episode selected', 'error');
+                return;
+            }
+            
+            showStatus(`Downloading "${episode.title}"...`, 'info');
+            
+            try {
+                const response = await fetch(`/api/podcasts/episodes/${episode.id}/download`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.href = result.data.downloadUrl;
+                    link.download = `${episode.title}.mp3`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    showStatus(`Download started for "${episode.title}"`, 'success');
+                } else {
+                    showStatus(`Download failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Helper functions
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+        
+        // Add event listener for Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchPodcasts();
+            }
+        });
+    </script>
+</body>
+</html>

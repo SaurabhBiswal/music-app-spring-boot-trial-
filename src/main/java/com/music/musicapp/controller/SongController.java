@@ -77,6 +77,31 @@ public class SongController {
         );
     }
     
+    // NEW ENDPOINT: Update song audio file path
+    @PutMapping("/{id}/audio")
+    public ResponseEntity<ApiResponse> updateSongAudio(
+        @PathVariable Long id,
+        @RequestParam("filename") String filename) {
+        try {
+            SongDTO updatedSong = songService.updateSongFilePath(id, filename);
+            return ResponseEntity.ok(
+                ApiResponse.success("Audio file updated for song", updatedSong)
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+    
+    // NEW ENDPOINT: Get songs with audio files
+    @GetMapping("/with-audio")
+    public ResponseEntity<ApiResponse> getSongsWithAudio() {
+        List<SongDTO> songs = songService.getSongsWithAudio();
+        return ResponseEntity.ok(
+            ApiResponse.success("Songs with audio files", songs)
+        );
+    }
+    
     // Health check
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {

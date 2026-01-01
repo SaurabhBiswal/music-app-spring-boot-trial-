@@ -3,23 +3,21 @@ package com.music.musicapp.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-    private Long id;  // Changed from long to Long (capital L)
+    private Long id;
     private String username;
     private String email;
-    private String fullName;
-    private String createdAt;
-    
-    // Remove the duplicate constructor below - @AllArgsConstructor already creates it
-    // public UserDTO(Long id, String username, String email, String fullName, String createdAt) {
-    //     this.id = id;
-    //     this.username = username;
-    //     this.email = email;
-    //     this.fullName = fullName;
-    //     this.createdAt = createdAt;
-    // }
+    private String avatarUrl;
+    private String bio;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastLogin;
+    private Integer followerCount;
+    private Integer followingCount;
+    private Integer playlistCount;
+    private Integer reviewCount;
 }

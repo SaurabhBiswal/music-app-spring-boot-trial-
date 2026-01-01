@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -29,7 +32,61 @@ public class User {
     private String fullName;
     
     @Column(name = "created_at")
-    private String createdAt;
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @Column(name = "profile_picture")
+    private String profilePicture;
+    
+    @Column(name = "bio", length = 500)
+    private String bio;
+    
+    @Column(name = "is_active")
+    private boolean isActive = true;
+    
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
+    
+    // User's owned playlists
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Playlist> ownedPlaylists = new ArrayList<>();
+    
+    // Playlists the user follows
+    @ManyToMany
+    @JoinTable(
+        name = "user_followed_playlists",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "playlist_id")
+    )
+    private List<Playlist> followedPlaylists = new ArrayList<>();
+    
+    // Users who follow this user
+    @ManyToMany
+    @JoinTable(
+        name = "user_followers",
+        joinColumns = @JoinColumn(name = "followed_id"), // This user is being followed
+        inverseJoinColumns = @JoinColumn(name = "follower_id") // Users who follow this user
+    )
+    private List<User> followers = new ArrayList<>();
+    
+    // Users this user is following
+    @ManyToMany
+    @JoinTable(
+        name = "user_following", 
+        joinColumns = @JoinColumn(name = "follower_id"), // This user is the follower
+        inverseJoinColumns = @JoinColumn(name = "followed_id") // Users being followed
+    )
+    private List<User> following = new ArrayList<>();
+    
+    // User's ratings
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Rating> ratings = new ArrayList<>();
+    
+    // User's play history
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PlayHistory> playHistory = new ArrayList<>();
     
     // Constructor without id (for creating new users)
     public User(String username, String email, String password, String fullName) {
@@ -37,6 +94,84 @@ public class User {
         this.email = email;
         this.password = password;
         this.fullName = fullName;
-        this.createdAt = java.time.LocalDateTime.now().toString();
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.isActive = true;
+    }
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+    
+    // Helper method to add a playlist
+    public void addPlaylist(Playlist playlist) {
+        if (ownedPlaylists == null) {
+            ownedPlaylists = new ArrayList<>();
+        }
+        ownedPlaylists.add(playlist);
+        playlist.setUser(this);
+    }
+    
+    // Helper method to remove a playlist
+    public void removePlaylist(Playlist playlist) {
+        if (ownedPlaylists != null) {
+            ownedPlaylists.remove(playlist);
+            playlist.setUser(null);
+        }
+    }
+    
+    // Helper method to follow a playlist
+    public void followPlaylist(Playlist playlist) {
+        if (followedPlaylists == null) {
+            followedPlaylists = new ArrayList<>();
+        }
+        if (!followedPlaylists.contains(playlist)) {
+            followedPlaylists.add(playlist);
+            if (playlist.getFollowers() == null) {
+                playlist.setFollowers(new ArrayList<>());
+            }
+            playlist.getFollowers().add(this);
+        }
+    }
+    
+    // Helper method to unfollow a playlist
+    public void unfollowPlaylist(Playlist playlist) {
+        if (followedPlaylists != null) {
+            followedPlaylists.remove(playlist);
+            if (playlist.getFollowers() != null) {
+                playlist.getFollowers().remove(this);
+            }
+        }
+    }
+    
+    // Helper method to follow another user
+    public void followUser(User userToFollow) {
+        if (following == null) {
+            following = new ArrayList<>();
+        }
+        if (!following.contains(userToFollow)) {
+            following.add(userToFollow);
+            if (userToFollow.getFollowers() == null) {
+                userToFollow.setFollowers(new ArrayList<>());
+            }
+            userToFollow.getFollowers().add(this);
+        }
+    }
+    
+    // Helper method to unfollow a user
+    public void unfollowUser(User userToUnfollow) {
+        if (following != null) {
+            following.remove(userToUnfollow);
+            if (userToUnfollow.getFollowers() != null) {
+                userToUnfollow.getFollowers().remove(this);
+            }
+        }
     }
 }

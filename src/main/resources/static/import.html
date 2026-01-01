@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Music - MusicHub Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #141E30, #243B55);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 107, 107, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+        }
+        
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .service-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 107, 107, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .service-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .service-name {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .service-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .connected {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ECC71;
+        }
+        
+        .disconnected {
+            background: rgba(231, 76, 60, 0.2);
+            color: #E74C3C;
+        }
+        
+        .service-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .service-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .connect-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .connect-primary {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+        }
+        
+        .connect-primary:hover {
+            background: linear-gradient(135deg, #FF8E53, #FF6B6B);
+            transform: scale(1.05);
+        }
+        
+        .connect-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .connect-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Import Progress */
+        .import-progress {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .progress-title {
+            font-size: 1.5rem;
+            color: #FF6B6B;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* Import History */
+        .history-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .history-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #FF6B6B;
+        }
+        
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .history-content {
+            flex: 1;
+        }
+        
+        .history-service {
+            font-weight: bold;
+            color: #FF8E53;
+        }
+        
+        .history-details {
+            color: #b3b3b3;
+            font-size: 0.9rem;
+        }
+        
+        .history-time {
+            color: #888;
+            font-size: 0.8rem;
+        }
+        
+        /* Search Across Services */
+        .search-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #FF6B6B;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .search-results {
+            margin-top: 20px;
+        }
+        
+        /* Import Statistics */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #FF6B6B;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #888;
+            font-size: 1rem;
+        }
+        
+        /* Status Messages */
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .success {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ECC71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            color: #E74C3C;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .info {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498DB;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        /* Loading Spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #b3b3b3;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #FF6B6B;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .service-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📥 Import Your Music</h1>
+            <p class="subtitle">
+                Bring your music from Spotify, YouTube, Apple Music, and other services.
+                Import playlists, favorites, and listening history to create your unified music library.
+            </p>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-btn">🏠 Home</a>
+                <a href="/music-player.html" class="nav-btn">🎧 Music Player</a>
+                <a href="/discover.html" class="nav-btn">🔍 Discover</a>
+                <a href="/podcast.html" class="nav-btn">🎙 Podcasts</a>
+                <a href="/recommendations.html" class="nav-btn">✨ Recommendations</a>
+                <a href="/social.html" class="nav-btn">👥 Social</a>
+                <a href="/import.html" class="nav-btn active">📥 Import</a>
+                <a href="/offline.html" class="nav-btn">💾 Offline</a>
+            </div>
+        </header>
+        
+        <!-- Import Statistics -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-value" id="totalImports">0</div>
+                <div class="stat-label">Total Imports</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="connectedServices">0</div>
+                <div class="stat-label">Connected Services</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="importedTracks">0</div>
+                <div class="stat-label">Imported Tracks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="importedPlaylists">0</div>
+                <div class="stat-label">Imported Playlists</div>
+            </div>
+        </div>
+        
+        <!-- Services Grid -->
+        <h2 style="margin-bottom: 20px; color: #FF6B6B;">
+            <i class="fas fa-plug"></i> Connect Your Music Services
+        </h2>
+        
+        <div id="servicesContainer" class="services-grid">
+            <!-- Services will be loaded here -->
+        </div>
+        
+        <!-- Import Progress -->
+        <div id="importProgress" class="import-progress" style="display: none;">
+            <div class="progress-header">
+                <h3 class="progress-title">
+                    <i class="fas fa-sync-alt"></i> Import in Progress
+                </h3>
+                <div id="progressPercentage">0%</div>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="progress-info">
+                <span id="progressStatus">Starting import...</span>
+                <span id="progressDetails">0/0 tracks</span>
+            </div>
+            
+            <div style="margin-top: 20px; display: none;" id="importActions">
+                <button class="connect-btn connect-primary" onclick="cancelImport()">
+                    <i class="fas fa-times"></i> Cancel Import
+                </button>
+                <button class="connect-btn connect-secondary" onclick="minimizeImport()">
+                    <i class="fas fa-window-minimize"></i> Minimize
+                </button>
+            </div>
+        </div>
+        
+        <!-- Search Across Services -->
+        <div class="search-section">
+            <h3 class="search-title">
+                <i class="fas fa-search"></i> Search Across All Connected Services
+            </h3>
+            
+            <div class="search-box">
+                <input type="text" 
+                       id="crossSearchInput" 
+                       class="search-input" 
+                       placeholder="Search for tracks, artists, or playlists..."
+                       onkeypress="if(event.keyCode==13) searchAcrossServices()">
+                <button class="search-btn" onclick="searchAcrossServices()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            
+            <div id="crossSearchResults" class="search-results">
+                <!-- Search results will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Import History -->
+        <div class="history-section">
+            <h3 class="history-title">
+                <i class="fas fa-history"></i> Import History
+            </h3>
+            
+            <div id="historyContainer" class="history-list">
+                <!-- Import history will be loaded here -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="nav-btn" onclick="loadMoreHistory()">
+                    <i class="fas fa-history"></i> View Full History
+                </button>
+                <button class="nav-btn" onclick="clearHistory()" style="background: rgba(231, 76, 60, 0.2);">
+                    <i class="fas fa-trash"></i> Clear History
+                </button>
+            </div>
+        </div>
+        
+        <!-- Bulk Import -->
+        <div class="search-section">
+            <h3 class="search-title">
+                <i class="fas fa-download"></i> Bulk Import Playlists
+            </h3>
+            
+            <div style="color: #b3b3b3; margin-bottom: 20px;">
+                Import multiple playlists at once from connected services
+            </div>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="nav-btn" onclick="importAllPlaylists()">
+                    <i class="fas fa-download"></i> Import All Playlists
+                </button>
+                <button class="nav-btn" onclick="importFavorites()">
+                    <i class="fas fa-heart"></i> Import Favorites
+                </button>
+                <button class="nav-btn" onclick="importRecentlyPlayed()">
+                    <i class="fas fa-history"></i> Import Recently Played
+                </button>
+            </div>
+        </div>
+        
+        <!-- Status Messages -->
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading import services...</p>
+        </div>
+    </div>
+
+    <script>
+        let importServices = [];
+        let currentImport = null;
+        
+        // Load import services on page load
+        window.onload = function() {
+            loadImportServices();
+            loadImportStats();
+            loadImportHistory();
+        };
+        
+        // Load import services
+        async function loadImportServices() {
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/api/import/services');
+                const result = await response.json();
+                
+                if (result.success) {
+                    importServices = result.data;
+                    displayServices(importServices);
+                    updateStats();
+                } else {
+                    showStatus(`Failed to load services: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+                loadDemoServices();
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Display services
+        function displayServices(services) {
+            const container = document.getElementById('servicesContainer');
+            container.innerHTML = '';
+            
+            services.forEach(service => {
+                const serviceCard = document.createElement('div');
+                serviceCard.className = 'service-card';
+                
+                serviceCard.innerHTML = `
+                    <div class="service-icon" style="color: ${service.color || '#FF6B6B'}">
+                        <i class="${service.icon || 'fas fa-music'}"></i>
+                    </div>
+                    
+                    <h3 class="service-name">${service.name}</h3>
+                    
+                    <div class="service-status ${service.connected ? 'connected' : 'disconnected'}">
+                        ${service.connected ? '<i class="fas fa-check-circle"></i> Connected' : '<i class="fas fa-times-circle"></i> Not Connected'}
+                    </div>
+                    
+                    <div class="service-stats">
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: bold;">${service.importCount || 0}</div>
+                            <div style="font-size: 0.8rem;">Tracks</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: bold;">${Math.floor(Math.random() * 10)}</div>
+                            <div style="font-size: 0.8rem;">Playlists</div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-actions">
+                        ${service.connected ? 
+                            `<button class="connect-btn connect-secondary" onclick="disconnectService('${service.id}')">
+                                <i class="fas fa-unlink"></i> Disconnect
+                            </button>
+                            <button class="connect-btn connect-primary" onclick="importFromService('${service.id}')">
+                                <i class="fas fa-download"></i> Import
+                            </button>` :
+                            `<button class="connect-btn connect-primary" onclick="connectService('${service.id}')" style="flex: 1;">
+                                <i class="fas fa-link"></i> Connect
+                            </button>`
+                        }
+                    </div>
+                `;
+                
+                container.appendChild(serviceCard);
+            });
+        }
+        
+        // Load demo services (fallback)
+        function loadDemoServices() {
+            const demoServices = [
+                {
+                    id: 'spotify',
+                    name: 'Spotify',
+                    icon: 'fab fa-spotify',
+                    color: '#1DB954',
+                    connected: true,
+                    importCount: 245
+                },
+                {
+                    id: 'youtube',
+                    name: 'YouTube Music',
+                    icon: 'fab fa-youtube',
+                    color: '#FF0000',
+                    connected: true,
+                    importCount: 128
+                },
+                {
+                    id: 'apple',
+                    name: 'Apple Music',
+                    icon: 'fab fa-apple',
+                    color: '#FA243C',
+                    connected: false,
+                    importCount: 0
+                },
+                {
+                    id: 'soundcloud',
+                    name: 'SoundCloud',
+                    icon: 'fab fa-soundcloud',
+                    color: '#FF3300',
+                    connected: true,
+                    importCount: 42
+                },
+                {
+                    id: 'deezer',
+                    name: 'Deezer',
+                    icon: 'fab fa-deezer',
+                    color: '#00C7F2',
+                    connected: false,
+                    importCount: 0
+                },
+                {
+                    id: 'tidal',
+                    name: 'Tidal',
+                    icon: 'fas fa-water',
+                    color: '#000000',
+                    connected: false,
+                    importCount: 0
+                }
+            ];
+            
+            importServices = demoServices;
+            displayServices(demoServices);
+            updateStats();
+        }
+        
+        // Update statistics
+        function updateStats() {
+            const connectedCount = importServices.filter(s => s.connected).length;
+            const totalImports = importServices.reduce((sum, s) => sum + (s.importCount || 0), 0);
+            
+            document.getElementById('connectedServices').textContent = connectedCount;
+            document.getElementById('totalImports').textContent = totalImports;
+            document.getElementById('importedTracks').textContent = totalImports;
+            document.getElementById('importedPlaylists').textContent = Math.floor(totalImports / 20);
+        }
+        
+        // Connect service
+        function connectService(serviceId) {
+            const service = importServices.find(s => s.id === serviceId);
+            
+            if (service) {
+                showStatus(`Connecting to ${service.name}...`, 'info');
+                
+                // Simulate API connection
+                setTimeout(() => {
+                    service.connected = true;
+                    service.importCount = service.importCount || 0;
+                    displayServices(importServices);
+                    updateStats();
+                    
+                    showStatus(`Successfully connected to ${service.name}!`, 'success');
+                    
+                    // Ask to import immediately
+                    if (confirm(`Would you like to import your ${service.name} playlists now?`)) {
+                        importFromService(serviceId);
+                    }
+                }, 2000);
+            }
+        }
+        
+        // Disconnect service
+        function disconnectService(serviceId) {
+            const service = importServices.find(s => s.id === serviceId);
+            
+            if (service && confirm(`Are you sure you want to disconnect from ${service.name}?`)) {
+                showStatus(`Disconnecting from ${service.name}...`, 'info');
+                
+                setTimeout(() => {
+                    service.connected = false;
+                    displayServices(importServices);
+                    updateStats();
+                    
+                    showStatus(`Disconnected from ${service.name}`, 'success');
+                }, 1000);
+            }
+        }
+        
+        // Import from service
+        async function importFromService(serviceId) {
+            const service = importServices.find(s => s.id === serviceId);
+            
+            if (!service || !service.connected) {
+                showStatus(`Please connect to ${service?.name || 'the service'} first`, 'error');
+                return;
+            }
+            
+            const importType = prompt(`What would you like to import from ${service.name}?\n1. Playlists\n2. Favorites/Liked Songs\n3. Recently Played\n4. Everything\n\nEnter 1-4:`, '1');
+            
+            if (!importType) return;
+            
+            // Show import progress
+            document.getElementById('importProgress').style.display = 'block';
+            document.getElementById('importActions').style.display = 'flex';
+            
+            currentImport = {
+                serviceId: serviceId,
+                type: importType,
+                progress: 0,
+                total: 100,
+                status: 'Starting import...'
+            };
+            
+            updateImportProgress();
+            
+            // Simulate import process
+            simulateImport(serviceId, importType);
+        }
+        
+        // Simulate import process
+        function simulateImport(serviceId, importType) {
+            const steps = [
+                'Connecting to service...',
+                'Fetching playlists...',
+                'Analyzing tracks...',
+                'Downloading metadata...',
+                'Importing tracks...',
+                'Creating playlists...',
+                'Finalizing...'
+            ];
+            
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step >= steps.length) {
+                    clearInterval(interval);
+                    
+                    // Import complete
+                    currentImport.progress = 100;
+                    currentImport.status = 'Import complete!';
+                    updateImportProgress();
+                    
+                    // Update service import count
+                    const service = importServices.find(s => s.id === serviceId);
+                    if (service) {
+                        service.importCount = (service.importCount || 0) + Math.floor(Math.random() * 50) + 10;
+                        displayServices(importServices);
+                        updateStats();
+                    }
+                    
+                    // Add to history
+                    addToImportHistory(serviceId, importType);
+                    
+                    showStatus(`Successfully imported from ${service?.name || 'service'}!`, 'success');
+                    
+                    // Auto-hide progress after 5 seconds
+                    setTimeout(() => {
+                        document.getElementById('importProgress').style.display = 'none';
+                        currentImport = null;
+                    }, 5000);
+                    
+                    return;
+                }
+                
+                currentImport.progress = Math.min((step + 1) * (100 / steps.length), 100);
+                currentImport.status = steps[step];
+                updateImportProgress();
+                
+                step++;
+            }, 800);
+        }
+        
+        // Update import progress display
+        function updateImportProgress() {
+            if (!currentImport) return;
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressPercentage = document.getElementById('progressPercentage');
+            const progressStatus = document.getElementById('progressStatus');
+            const progressDetails = document.getElementById('progressDetails');
+            
+            progressBar.style.width = `${currentImport.progress}%`;
+            progressPercentage.textContent = `${Math.round(currentImport.progress)}%`;
+            progressStatus.textContent = currentImport.status;
+            progressDetails.textContent = `${Math.round(currentImport.progress)}/${currentImport.total} tracks`;
+        }
+        
+        // Cancel import
+        function cancelImport() {
+            if (currentImport && confirm('Are you sure you want to cancel the import?')) {
+                showStatus('Import cancelled', 'info');
+                document.getElementById('importProgress').style.display = 'none';
+                currentImport = null;
+            }
+        }
+        
+        // Minimize import
+        function minimizeImport() {
+            document.getElementById('importProgress').style.display = 'none';
+            showStatus('Import minimized to background', 'info');
+        }
+        
+        // Load import history
+        async function loadImportHistory() {
+            try {
+                // Mock history data
+                const history = [
+                    {
+                        id: 1,
+                        service: 'Spotify',
+                        type: 'Playlists',
+                        details: 'Imported 3 playlists with 85 tracks',
+                        time: '2 hours ago',
+                        icon: 'fab fa-spotify',
+                        color: '#1DB954'
+                    },
+                    {
+                        id: 2,
+                        service: 'YouTube Music',
+                        type: 'Favorites',
+                        details: 'Imported 42 liked tracks',
+                        time: '1 day ago',
+                        icon: 'fab fa-youtube',
+                        color: '#FF0000'
+                    },
+                    {
+                        id: 3,
+                        service: 'SoundCloud',
+                        type: 'Playlists',
+                        details: 'Imported 2 playlists with 28 tracks',
+                        time: '3 days ago',
+                        icon: 'fab fa-soundcloud',
+                        color: '#FF3300'
+                    },
+                    {
+                        id: 4,
+                        service: 'Spotify',
+                        type: 'Recently Played',
+                        details: 'Imported 120 recently played tracks',
+                        time: '1 week ago',
+                        icon: 'fab fa-spotify',
+                        color: '#1DB954'
+                    }
+                ];
+                
+                displayImportHistory(history);
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+        
+        // Display import history
+        function displayImportHistory(history) {
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = '';
+            
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                historyItem.innerHTML = `
+                    <div class="history-icon" style="background: ${item.color}20; color: ${item.color}">
+                        <i class="${item.icon}"></i>
+                    </div>
+                    <div class="history-content">
+                        <div>
+                            <span class="history-service">${item.service}</span>
+                            • ${item.type}
+                        </div>
+                        <div class="history-details">${item.details}</div>
+                    </div>
+                    <div class="history-time">${item.time}</div>
+                `;
+                
+                container.appendChild(historyItem);
+            });
+        }
+        
+        // Add to import history
+        function addToImportHistory(serviceId, importType) {
+            const service = importServices.find(s => s.id === serviceId);
+            if (!service) return;
+            
+            const historyItem = {
+                id: Date.now(),
+                service: service.name,
+                type: getImportTypeName(importType),
+                details: `Imported ${Math.floor(Math.random() * 50) + 10} items`,
+                time: 'Just now',
+                icon: service.icon,
+                color: service.color
+            };
+            
+            // Prepend to history
+            const container = document.getElementById('historyContainer');
+            const historyItemEl = document.createElement('div');
+            historyItemEl.className = 'history-item';
+            historyItemEl.innerHTML = `
+                <div class="history-icon" style="background: ${historyItem.color}20; color: ${historyItem.color}">
+                    <i class="${historyItem.icon}"></i>
+                </div>
+                <div class="history-content">
+                    <div>
+                        <span class="history-service">${historyItem.service}</span>
+                        • ${historyItem.type}
+                    </div>
+                    <div class="history-details">${historyItem.details}</div>
+                </div>
+                <div class="history-time">${historyItem.time}</div>
+            `;
+            
+            container.prepend(historyItemEl);
+        }
+        
+        // Get import type name
+        function getImportTypeName(type) {
+            switch(type) {
+                case '1': return 'Playlists';
+                case '2': return 'Favorites';
+                case '3': return 'Recently Played';
+                case '4': return 'Everything';
+                default: return 'Content';
+            }
+        }
+        
+        // Load more history
+        function loadMoreHistory() {
+            showStatus('Loading more history...', 'info');
+            // In production, load paginated history
+        }
+        
+        // Clear history
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all import history?')) {
+                document.getElementById('historyContainer').innerHTML = '';
+                showStatus('Import history cleared', 'success');
+            }
+        }
+        
+        // Search across services
+        async function searchAcrossServices() {
+            const query = document.getElementById('crossSearchInput').value.trim();
+            
+            if (!query) {
+                showStatus('Please enter a search term', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Mock search results
+                const results = [
+                    {
+                        service: 'Spotify',
+                        title: query + ' - Radio Mix',
+                        artist: 'Various Artists',
+                        type: 'Playlist',
+                        tracks: 50,
+                        canImport: true
+                    },
+                    {
+                        service: 'YouTube Music',
+                        title: query + ' Official Audio',
+                        artist: 'Popular Artist',
+                        type: 'Track',
+                        duration: '3:45',
+                        canImport: true
+                    },
+                    {
+                        service: 'SoundCloud',
+                        title: query + ' Remix',
+                        artist: 'DJ Producer',
+                        type: 'Track',
+                        duration: '4:20',
+                        canImport: true
+                    },
+                    {
+                        service: 'Apple Music',
+                        title: query + ' Album',
+                        artist: 'Famous Band',
+                        type: 'Album',
+                        tracks: 12,
+                        canImport: false
+                    }
+                ];
+                
+                displaySearchResults(results);
+                showStatus(`Found ${results.length} results across services`, 'success');
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Display search results
+        function displaySearchResults(results) {
+            const container = document.getElementById('crossSearchResults');
+            container.innerHTML = '';
+            
+            results.forEach(result => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'history-item';
+                
+                resultItem.innerHTML = `
+                    <div class="history-icon" style="background: rgba(255,255,255,0.1);">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="history-content">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <strong>${result.title}</strong>
+                                <div style="color: #888; font-size: 0.9rem;">${result.artist} • ${result.service}</div>
+                            </div>
+                            <div style="color: #888; font-size: 0.9rem;">
+                                ${result.type} ${result.tracks ? `• ${result.tracks} tracks` : ''} ${result.duration ? `• ${result.duration}` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        ${result.canImport ? 
+                            `<button class="nav-btn" onclick="importSearchResult('${result.service}', '${result.title}')" style="padding: 8px 12px; font-size: 12px;">
+                                <i class="fas fa-download"></i> Import
+                            </button>` :
+                            `<button class="nav-btn" style="padding: 8px 12px; font-size: 12px; background: rgba(255,255,255,0.05);" disabled>
+                                <i class="fas fa-times"></i> Not Connected
+                            </button>`
+                        }
+                    </div>
+                `;
+                
+                container.appendChild(resultItem);
+            });
+        }
+        
+        // Import search result
+        function importSearchResult(service, title) {
+            showStatus(`Importing "${title}" from ${service}...`, 'info');
+            setTimeout(() => {
+                showStatus(`Imported "${title}" successfully!`, 'success');
+            }, 2000);
+        }
+        
+        // Import all playlists
+        function importAllPlaylists() {
+            const connectedServices = importServices.filter(s => s.connected);
+            
+            if (connectedServices.length === 0) {
+                showStatus('No services connected. Please connect at least one service first.', 'error');
+                return;
+            }
+            
+            if (confirm(`Import all playlists from ${connectedServices.length} connected services?`)) {
+                showStatus('Starting bulk import of all playlists...', 'info');
+                
+                // Simulate bulk import
+                setTimeout(() => {
+                    const totalImported = Math.floor(Math.random() * 100) + 50;
+                    showStatus(`Successfully imported ${totalImported} playlists!`, 'success');
+                    
+                    // Update stats
+                    importServices.forEach(s => {
+                        if (s.connected) {
+                            s.importCount = (s.importCount || 0) + Math.floor(Math.random() * 30) + 10;
+                        }
+                    });
+                    
+                    displayServices(importServices);
+                    updateStats();
+                }, 3000);
+            }
+        }
+        
+        // Import favorites
+        function importFavorites() {
+            const connectedServices = importServices.filter(s => s.connected);
+            
+            if (connectedServices.length === 0) {
+                showStatus('No services connected.', 'error');
+                return;
+            }
+            
+            showStatus('Importing favorites from all connected services...', 'info');
+            
+            setTimeout(() => {
+                const totalImported = Math.floor(Math.random() * 200) + 100;
+                showStatus(`Imported ${totalImported} favorite tracks!`, 'success');
+            }, 2500);
+        }
+        
+        // Import recently played
+        function importRecentlyPlayed() {
+            const connectedServices = importServices.filter(s => s.connected);
+            
+            if (connectedServices.length === 0) {
+                showStatus('No services connected.', 'error');
+                return;
+            }
+            
+            showStatus('Importing recently played tracks...', 'info');
+            
+            setTimeout(() => {
+                const totalImported = Math.floor(Math.random() * 150) + 80;
+                showStatus(`Imported ${totalImported} recently played tracks!`, 'success');
+            }, 2500);
+        }
+        
+        // Load import stats
+        async function loadImportStats() {
+            try {
+                const response = await fetch('/api/import/stats');
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('totalImports').textContent = result.data.totalImports || 0;
+                    document.getElementById('connectedServices').textContent = result.data.activeServices || 0;
+                    document.getElementById('importedTracks').textContent = result.data.totalTracksImported || 0;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        // Helper functions
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+        
+        // Add event listener for Enter key
+        document.getElementById('crossSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchAcrossServices();
+            }
+        });
+    </script>
+</body>
+</html>
