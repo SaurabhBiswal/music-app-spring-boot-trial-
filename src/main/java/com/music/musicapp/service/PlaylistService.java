@@ -258,4 +258,43 @@ public class PlaylistService {
             .map(this::convertToDTO)
             .collect(Collectors.toList());
     }
+    // PlaylistService.java ke end mein add karo
+    @Transactional
+public PlaylistDTO addExternalSongToPlaylist(Long playlistId, SongDTO songDTO) {
+    // 1. Playlist dhundho
+    Playlist playlist = playlistRepository.findById(playlistId)
+            .orElseThrow(() -> new RuntimeException("Playlist not found"));
+
+    // 2. Check karo gaana DB mein hai ya nahi (audioUrl se)
+    Optional<Song> existingSong = songRepository.findByAudioUrl(songDTO.getAudioUrl());
+    
+    Song songToLink;
+    if (existingSong.isPresent()) {
+        songToLink = existingSong.get();
+    } else {
+        // Naya gaana banao bina setCreatedAt ke (taki error na aaye)
+        Song newSong = new Song();
+        newSong.setTitle(songDTO.getTitle());
+        newSong.setArtist(songDTO.getArtist());
+        newSong.setAlbum(songDTO.getAlbum());
+        newSong.setAudioUrl(songDTO.getAudioUrl());
+        newSong.setAlbumArtUrl(songDTO.getAlbumArtUrl());
+        
+        // Agar Song.java mein genre hai toh wo bhi set kar sakte ho
+        songToLink = songRepository.save(newSong);
+    }
+
+    // 3. Playlist mein add karo
+    if (playlist.getSongs() == null) {
+        playlist.setSongs(new ArrayList<>());
+    }
+    
+    if (!playlist.getSongs().contains(songToLink)) {
+        playlist.getSongs().add(songToLink);
+        playlist.setUpdatedAt(LocalDateTime.now());
+        playlistRepository.save(playlist);
+    }
+
+    return convertToDTO(playlist);
+}
 }

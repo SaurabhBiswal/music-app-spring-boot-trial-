@@ -89,7 +89,7 @@ public class Song {
     
     @Column(name = "bitrate") // in kbps
     private Integer bitrate;
-    
+    private LocalDateTime createdAt;
     // Pre-persist
     @PrePersist
     protected void onCreate() {

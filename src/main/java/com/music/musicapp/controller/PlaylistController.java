@@ -96,7 +96,17 @@ public class PlaylistController {
                 .body(ApiResponse.error(e.getMessage()));
         }
     }
-    
+    @PostMapping("/{playlistId}/songs")
+public ResponseEntity<ApiResponse> addExternalSongToPlaylist(
+        @PathVariable Long playlistId,
+        @RequestBody SongDTO songDTO) {
+    try {
+        PlaylistDTO playlist = playlistService.addExternalSongToPlaylist(playlistId, songDTO);
+        return ResponseEntity.ok(ApiResponse.success("Song added to playlist!", playlist));
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+    }
+}
     // Remove song from playlist
     @DeleteMapping("/{playlistId}/songs/{songId}")
     public ResponseEntity<ApiResponse> removeSongFromPlaylist(
