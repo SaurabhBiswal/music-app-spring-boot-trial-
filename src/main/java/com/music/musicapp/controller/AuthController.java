@@ -50,4 +50,19 @@ public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest loginRequest)
         User savedUser = userRepository.save(user);
         return ResponseEntity.ok(ApiResponse.success("Account ban gaya!", savedUser));
     }
+    // AuthController.java ke andar
+@Autowired
+private com.music.musicapp.repository.SongRepository songRepository;
+
+@Autowired
+private com.music.musicapp.repository.PlaylistRepository playlistRepository;
+
+@GetMapping("/stats")
+public ResponseEntity<java.util.Map<String, Long>> getStats() {
+    java.util.Map<String, Long> stats = new java.util.HashMap<>();
+    stats.put("totalSongs", songRepository.count());
+    stats.put("totalPlaylists", playlistRepository.count());
+    stats.put("totalUsers", userRepository.count());
+    return ResponseEntity.ok(stats);
+}
 }

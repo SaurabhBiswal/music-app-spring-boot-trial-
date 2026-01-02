@@ -32,7 +32,11 @@ public class PlaylistService {
     
     @Autowired
     private SongService songService;
-    
+     public List<PlaylistDTO> getPlaylistsByUserId(Long userId) {
+    return playlistRepository.findByUserId(userId).stream()
+        .map(this::convertToDTO)
+        .collect(Collectors.toList());
+}
     // Get all public playlists
     public List<PlaylistDTO> getAllPublicPlaylists() {
         return playlistRepository.findByIsPublicTrue().stream()
