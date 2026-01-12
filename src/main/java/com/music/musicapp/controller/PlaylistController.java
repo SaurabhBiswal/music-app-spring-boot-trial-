@@ -103,31 +103,33 @@ public class PlaylistController {
     }
 
     @GetMapping("/{id}/share")
-    public ResponseEntity<ApiResponse> getPlaylistShareInfo(@PathVariable Long id) {
-        try {
-            PlaylistDTO playlist = playlistService.getPlaylistById(id);
-            
-            Map<String, Object> shareInfo = new HashMap<>();
-            shareInfo.put("id", playlist.getId());
-            shareInfo.put("name", playlist.getName());
-            shareInfo.put("description", playlist.getDescription());
-            shareInfo.put("isPublic", playlist.isPublic());
-            shareInfo.put("songCount", playlist.getSongs() != null ? playlist.getSongs().size() : 0);
-            
-            // ✅ FIXED: getUsername() use karo, getUser() nahi
-            shareInfo.put("createdBy", playlist.getUsername() != null ? playlist.getUsername() : "Anonymous");
-            
-            shareInfo.put("shareUrl", "http://localhost:8080/#/playlist/" + playlist.getId());
-            shareInfo.put("qrCode", "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + 
-                "http://localhost:8080/#/playlist/" + playlist.getId());
-            shareInfo.put("shareable", playlist.isPublic());
-            
-            return ResponseEntity.ok(ApiResponse.success("Share info", shareInfo));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
-        }
+public ResponseEntity<ApiResponse> getPlaylistShareInfo(@PathVariable Long id) {
+    try {
+        PlaylistDTO playlist = playlistService.getPlaylistById(id);
+        
+        Map<String, Object> shareInfo = new HashMap<>();
+        shareInfo.put("id", playlist.getId());
+        shareInfo.put("name", playlist.getName());
+        shareInfo.put("description", playlist.getDescription());
+        shareInfo.put("isPublic", playlist.isPublic());
+        shareInfo.put("songCount", playlist.getSongs() != null ? playlist.getSongs().size() : 0);
+        
+        // ✅ FIXED: getUsername() use karo, getUser() nahi
+        shareInfo.put("createdBy", playlist.getUsername() != null ? playlist.getUsername() : "Anonymous");
+        
+        // ✅ FIXED: Frontend URL use karo (localhost:3000)
+        String frontendUrl = "http://localhost:3000";
+        String shareUrl = frontendUrl + "/playlist/" + playlist.getId();
+        
+        shareInfo.put("shareUrl", shareUrl);
+        shareInfo.put("qrCode", "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + shareUrl);
+        shareInfo.put("shareable", playlist.isPublic());
+        
+        return ResponseEntity.ok(ApiResponse.success("Share info", shareInfo));
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
     }
-
+}
     // --- 3. SONG MANAGEMENT (Add/Remove) ---
 
     @PostMapping("/{playlistId}/songs/{songId}")

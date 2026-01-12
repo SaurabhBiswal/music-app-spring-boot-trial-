@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/songs")
 @CrossOrigin(origins = "*")
@@ -160,6 +162,49 @@ private SongRepository songRepository;
             ApiResponse.success("Featured songs", songs)
         );
     }
+    @GetMapping("/recommendations/{songId}")
+public ResponseEntity<ApiResponse> getRecommendations(@PathVariable Long songId) {
+    Optional<Song> currentSongOpt = songRepository.findById(songId);
+    
+    if (currentSongOpt.isEmpty()) {
+        return ResponseEntity.badRequest().body(ApiResponse.error("Song not found"));
+    }
+    
+    Song currentSong = currentSongOpt.get();
+    
+    // ✅ FIX: Pehle recommendations ko initialize karo
+    List<Song> recommendations = new ArrayList<>();
+    
+    // Same artist ke songs
+    if (currentSong.getArtist() != null && !currentSong.getArtist().trim().isEmpty()) {
+        List<Song> sameArtistSongs = songRepository
+            .findByArtistContainingIgnoreCase(currentSong.getArtist());
+        
+        // ✅ FIX: New variable mein store karo
+        List<Song> artistRecommendations = sameArtistSongs.stream()
+            .filter(song -> !song.getId().equals(songId))
+            .limit(3)
+            .collect(Collectors.toList());
+        
+        recommendations.addAll(artistRecommendations);
+    }
+    
+    // Agar kam recommendations hain, toh same genre ke songs add karo
+    if (recommendations.size() < 3 && currentSong.getGenre() != null && !currentSong.getGenre().trim().isEmpty()) {
+        List<Song> sameGenreSongs = songRepository
+            .findByGenreContainingIgnoreCase(currentSong.getGenre());
+        
+        List<Song> genreRecommendations = sameGenreSongs.stream()
+            .filter(song -> !song.getId().equals(songId))
+            .filter(song -> recommendations.stream().noneMatch(rec -> rec.getId().equals(song.getId())))
+            .limit(3 - recommendations.size())
+            .collect(Collectors.toList());
+        
+        recommendations.addAll(genreRecommendations);
+    }
+    
+    return ResponseEntity.ok(ApiResponse.success("Recommendations", recommendations));
+}
     @GetMapping("/search/external")
 public ResponseEntity<ApiResponse> searchExternal(@RequestParam String query) {
     try {

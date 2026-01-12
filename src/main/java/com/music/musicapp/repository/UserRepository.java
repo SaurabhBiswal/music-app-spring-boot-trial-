@@ -3,7 +3,7 @@ package com.music.musicapp.repository;
 import com.music.musicapp.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,4 +23,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     // Find by username or email (for login)
     Optional<User> findByUsernameOrEmail(String username, String email);
+    List<User> findTop5ByOrderByIdDesc();
 }

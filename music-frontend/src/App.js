@@ -12,6 +12,10 @@ import {
   MinusCircle, Edit, Copy, ExternalLink, BarChart3
 } from 'lucide-react';
 
+// ✅ PHASE 2 & 3 IMPORTS
+import AdminDashboard from './components/AdminDashboard';
+import Recommendations from './components/Recommendations';
+
 function App() {
   const [query, setQuery] = useState('');
   const [songs, setSongs] = useState([]);
@@ -35,6 +39,10 @@ function App() {
   const [tempName, setTempName] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareInfo, setShareInfo] = useState(null);
+  
+  // ✅ PHASE 2 & 3 STATE
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [adminStats, setAdminStats] = useState(null);
   
   // ✅ Auth Form state management
   const [authForm, setAuthForm] = useState({ username: '', password: '', email: '' });
@@ -63,6 +71,7 @@ function App() {
       setSongs(res.data.data);
       setView('home');
       setActivePlaylistId(null);
+      setShowAdmin(false);
     } catch (e) { console.log("Load error"); }
   };
 
@@ -74,24 +83,45 @@ function App() {
     } catch (e) { console.log("Stats error"); }
   };
 
+  // ✅ PHASE 2: Fetch Admin Stats
+  const fetchAdminStats = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:8080/api/admin/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.status === 403) {
+        alert('Access denied! Admin only.');
+        setShowAdmin(false);
+        return;
+      }
+      
+      const result = await res.json();
+      if (result.status === "success") {
+        setAdminStats(result.data);
+      }
+    } catch (error) {
+      console.error("Error fetching admin stats:", error);
+    }
+  };
+
   const fetchUserPlaylists = async (userId) => {
     try {
       const res = await fetchWithAuth(`http://localhost:8080/api/playlists/user/${userId}`);
       const result = await res.json();
       
-      // ✅ FIX: Ensure playlists is always an array
       if (result.status === "success") {
         let playlistData = result.data;
         
-        // Handle different response formats
         if (playlistData && playlistData.data) {
-          playlistData = playlistData.data; // If nested in data property
+          playlistData = playlistData.data;
         }
         
-        // Convert to array if it's not
         const playlistsArray = Array.isArray(playlistData) ? playlistData : [];
         
-        // If it's a single object, put it in array
         if (playlistData && typeof playlistData === 'object' && !Array.isArray(playlistData)) {
           playlistsArray.push(playlistData);
         }
@@ -99,12 +129,11 @@ function App() {
         setPlaylists(playlistsArray);
         localStorage.setItem(`userPlaylists_${userId}`, JSON.stringify(playlistsArray));
       } else {
-        // If API fails or no playlists, set empty array
         setPlaylists([]);
       }
     } catch (error) {
       console.error("Error fetching playlists:", error);
-      setPlaylists([]); // ✅ Set empty array on error
+      setPlaylists([]);
     }
   };
 
@@ -138,7 +167,6 @@ function App() {
         const localPL = localStorage.getItem(`userPlaylists_${user.id}`);
         if (localPL) {
           const parsed = JSON.parse(localPL);
-          // ✅ Ensure it's an array
           setPlaylists(Array.isArray(parsed) ? parsed : []);
         }
         
@@ -192,33 +220,26 @@ function App() {
       const result = await res.json();
       
       if (result.status === "success") {
-        // ✅ Extract JWT token and user from response
         const { token, user } = result.data;
         
-        // ✅ Store JWT token in localStorage
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
-        
-        // Set user state
         setLoggedInUser(user);
         
-        // ✅ Log for debugging
         console.log("JWT Token stored:", token);
         console.log("User role:", user.role);
         
-        // Clear state
         setPlayHistory([]);
-        setPlaylists([]); // ✅ Reset to empty array
+        setPlaylists([]);
         setUserPlaylistId(null);
         setActivePlaylistId(null);
         setCurrentSong(null);
         setView('home');
+        setShowAdmin(false);
         
-        // Load user data
         ensurePlaylistExists(user.id);
         fetchUserPlaylists(user.id);
         
-        // Load history
         const savedHistory = localStorage.getItem(`musicHistory_${user.id}`);
         if (savedHistory) {
           setPlayHistory(JSON.parse(savedHistory));
@@ -239,18 +260,20 @@ function App() {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setLoggedInUser(null);
-    setPlaylists([]); // ✅ Set to empty array
+    setPlaylists([]);
     setPlayHistory([]);
     setUserPlaylistId(null);
     setActivePlaylistId(null);
     setCurrentSong(null);
     setView('home');
+    setShowAdmin(false);
     window.location.reload(); 
   };
 
   const playSong = (song) => {
     setCurrentSong(song);
     setView('playing');
+    setShowAdmin(false);
     const updatedHistory = [song, ...playHistory.filter(s => s.id !== song.id)].slice(0, 20);
     setPlayHistory(updatedHistory);
     
@@ -333,6 +356,7 @@ function App() {
         setSongs(songs);
         setView('playlist-view');
         setActivePlaylistId(playlistId);
+        setShowAdmin(false);
         
         if (songs.length > 0) {
           setTimeout(() => {
@@ -361,7 +385,6 @@ function App() {
         setShowShareModal(true);
       }
     } catch(e) { 
-      // If API fails, create basic share info
       const basicShareInfo = {
         id: playlistId,
         name: playlistName,
@@ -387,6 +410,7 @@ function App() {
       setSongs(res.data.data);
       setView('search');
       setActivePlaylistId(null);
+      setShowAdmin(false);
     } catch (e) { alert("Search failed!"); }
   };
 
@@ -398,6 +422,7 @@ function App() {
         setView('playlist-view');
         setActivePlaylistId(pId);
         setMenuOpen(null);
+        setShowAdmin(false);
       }
     } catch (e) { alert("Playlist empty!"); }
   };
@@ -441,6 +466,15 @@ function App() {
     return match ? match[1] : null;
   };
 
+  // ✅ PHASE 2: Toggle Admin Dashboard
+  const toggleAdminDashboard = async () => {
+    if (!showAdmin) {
+      await fetchAdminStats();
+    }
+    setShowAdmin(!showAdmin);
+    setView('home');
+  };
+
   if (!loggedInUser) {
     return (
       <div style={styles.authContainer}>
@@ -475,19 +509,19 @@ function App() {
         </div>
         
         <nav style={styles.nav}>
-          <div style={{...styles.navItem, color: view === 'home' ? '#1DB954' : 'white'}} onClick={loadFeatured}>
+          <div style={{...styles.navItem, color: view === 'home' && !showAdmin ? '#1DB954' : 'white'}} onClick={loadFeatured}>
             <Home size={22} /> Home
           </div>
-          <div style={{...styles.navItem, color: view === 'search' ? '#1DB954' : 'white'}} onClick={() => setView('search')}>
+          <div style={{...styles.navItem, color: view === 'search' ? '#1DB954' : 'white'}} onClick={() => { setView('search'); setShowAdmin(false); }}>
             <Search size={22} /> Search
           </div>
-          <div style={{...styles.navItem, color: view === 'history' ? '#1DB954' : 'white'}} onClick={() => setView('history')}>
+          <div style={{...styles.navItem, color: view === 'history' ? '#1DB954' : 'white'}} onClick={() => { setView('history'); setShowAdmin(false); }}>
             <History size={22} /> History
           </div>
           
-          {/* ✅ ADMIN DASHBOARD LINK - Only show for ADMIN users */}
+          {/* ✅ PHASE 2: ADMIN DASHBOARD LINK - Only show for ADMIN users */}
           {loggedInUser && loggedInUser.role === 'ADMIN' && (
-            <div style={{...styles.navItem, color: view === 'admin' ? '#1DB954' : 'white'}} onClick={() => setView('admin')}>
+            <div style={{...styles.navItem, color: showAdmin ? '#1DB954' : 'white'}} onClick={toggleAdminDashboard}>
               <BarChart3 size={22} /> Admin Dashboard
             </div>
           )}
@@ -511,7 +545,6 @@ function App() {
               Liked Songs
             </div>
             
-            {/* ✅ FIX: Check if playlists is array before mapping */}
             {Array.isArray(playlists) && playlists.map((p) => (
               <div key={p.id} style={styles.playlistItemContainer}>
                 {renamingId === p.id ? (
@@ -560,95 +593,138 @@ function App() {
       </div>
 
       <div style={styles.main}>
-        {view !== 'playing' && view !== 'admin' && (
-          <div style={styles.searchBar}>
-            <input style={styles.input} placeholder="Search songs..." value={query} 
-                   onChange={(e) => setQuery(e.target.value)} 
-                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()} />
-            <button onClick={handleSearch} style={styles.searchBtn}>
-              <Search size={20} />
-            </button>
-          </div>
-        )}
-
-        {/* ✅ ADMIN DASHBOARD VIEW */}
-        {view === 'admin' && loggedInUser && loggedInUser.role === 'ADMIN' && (
-          <div style={styles.adminContainer}>
-            <h2>📊 Admin Dashboard</h2>
-            <div style={styles.statsGrid}>
-              <div style={styles.statCard}>
-                <h3>👥 Total Users</h3>
-                <p style={styles.statNumber}>{stats.totalUsers || 0}</p>
-              </div>
-              <div style={styles.statCard}>
-                <h3>🎵 Total Songs</h3>
-                <p style={styles.statNumber}>{stats.totalSongs || 0}</p>
-              </div>
-              <div style={styles.statCard}>
-                <h3>📁 Total Playlists</h3>
-                <p style={styles.statNumber}>{stats.totalPlaylists || 0}</p>
-              </div>
-            </div>
-            
-            <div style={styles.adminSection}>
-              <h3>Recent Activity</h3>
-              <p>Welcome, Admin! JWT Authentication is successfully implemented.</p>
-              <p>User Role: <strong>{loggedInUser.role}</strong></p>
-              <p>Features Added: JWT Authentication, Role-Based Access, Admin Dashboard</p>
-            </div>
-          </div>
-        )}
-
-        {(view === 'home' || view === 'search' || view === 'history' || view === 'playlist-view') && (
+        {/* ✅ PHASE 2: ADMIN DASHBOARD */}
+        {showAdmin && loggedInUser && loggedInUser.role === 'ADMIN' ? (
+          <AdminDashboard />
+        ) : (
           <>
-            <h2 style={{ marginBottom: '20px', textTransform: 'capitalize' }}>
-              {activePlaylistId ? (playlists.find(p => p.id === activePlaylistId)?.name) : view}
-            </h2>
-            
-            <div style={styles.songGrid}>
-              {(view === 'history' ? playHistory : songs).map((song, index) => (
-                <div key={index} style={styles.card} onClick={() => playSong(song)}>
-                  <img src={song.albumArtUrl || 'https://via.placeholder.com/150'} style={styles.albumArt} alt="art" />
-                  <div style={styles.moreIcon} onClick={(e) => { 
-                    e.stopPropagation(); 
-                    setMenuOpen(menuOpen === index ? null : index); 
-                  }}>
-                    <MoreVertical size={20} />
-                  </div>
-                  
-                  {menuOpen === index && (
-                    <div style={styles.contextMenu} onClick={(e) => e.stopPropagation()}>
-                      <div style={styles.menuHeader}>Save to...</div>
-                      <div style={styles.menuItem} onClick={() => addToSpecificPlaylist(song, userPlaylistId)}>
-                        <Plus size={14}/> Liked Songs
+            {view !== 'playing' && (
+              <div style={styles.searchBar}>
+                <input style={styles.input} placeholder="Search songs..." value={query} 
+                       onChange={(e) => setQuery(e.target.value)} 
+                       onKeyPress={(e) => e.key === 'Enter' && handleSearch()} />
+                <button onClick={handleSearch} style={styles.searchBtn}>
+                  <Search size={20} />
+                </button>
+              </div>
+            )}
+
+            {(view === 'home' || view === 'search' || view === 'history' || view === 'playlist-view') && (
+              <>
+                <h2 style={{ marginBottom: '20px', textTransform: 'capitalize' }}>
+                  {activePlaylistId ? (playlists.find(p => p.id === activePlaylistId)?.name) : view}
+                </h2>
+                
+                <div style={styles.songGrid}>
+                  {(view === 'history' ? playHistory : songs).map((song, index) => (
+                    <div key={index} style={styles.card} onClick={() => playSong(song)}>
+                      <img src={song.albumArtUrl || 'https://via.placeholder.com/150'} style={styles.albumArt} alt="art" />
+                      <div style={styles.moreIcon} onClick={(e) => { 
+                        e.stopPropagation(); 
+                        setMenuOpen(menuOpen === index ? null : index); 
+                      }}>
+                        <MoreVertical size={20} />
                       </div>
                       
-                      {/* ✅ FIX: Check if playlists is array before mapping */}
-                      {Array.isArray(playlists) && playlists.map(p => (
-                        <div key={p.id} style={styles.menuItem} onClick={() => addToSpecificPlaylist(song, p.id)}>
-                          <Disc size={14}/> {p.name}
-                        </div>
-                      ))}
-                      
-                      {view === 'playlist-view' && (
-                        <div style={{...styles.menuItem, color:'#ff4d4d'}} onClick={() => removeFromPlaylist(song.id)}>
-                          <MinusCircle size={14}/> Remove from Playlist
+                      {menuOpen === index && (
+                        <div style={styles.contextMenu} onClick={(e) => e.stopPropagation()}>
+                          <div style={styles.menuHeader}>Save to...</div>
+                          <div style={styles.menuItem} onClick={() => addToSpecificPlaylist(song, userPlaylistId)}>
+                            <Plus size={14}/> Liked Songs
+                          </div>
+                          
+                          {Array.isArray(playlists) && playlists.map(p => (
+                            <div key={p.id} style={styles.menuItem} onClick={() => addToSpecificPlaylist(song, p.id)}>
+                              <Disc size={14}/> {p.name}
+                            </div>
+                          ))}
+                          
+                          {view === 'playlist-view' && (
+                            <div style={{...styles.menuItem, color:'#ff4d4d'}} onClick={() => removeFromPlaylist(song.id)}>
+                              <MinusCircle size={14}/> Remove from Playlist
+                            </div>
+                          )}
+                          
+                          <hr style={{borderColor:'#444', margin: '5px 0'}}/>
+                          
+                          <div style={styles.menuItem} onClick={() => copyToClipboard(song.audioUrl)}>
+                            <Copy size={14}/> Copy Song URL
+                          </div>
                         </div>
                       )}
                       
-                      <hr style={{borderColor:'#444', margin: '5px 0'}}/>
-                      
-                      <div style={styles.menuItem} onClick={() => copyToClipboard(song.audioUrl)}>
-                        <Copy size={14}/> Copy Song URL
-                      </div>
+                      <div style={{ fontWeight: 'bold', marginTop: '10px' }}>{song.title}</div>
+                      <div style={{ color: '#b3b3b3', fontSize: '12px' }}>{song.artist}</div>
                     </div>
-                  )}
-                  
-                  <div style={{ fontWeight: 'bold', marginTop: '10px' }}>{song.title}</div>
-                  <div style={{ color: '#b3b3b3', fontSize: '12px' }}>{song.artist}</div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
+
+            {view === 'playing' && currentSong && (
+              <div style={styles.playingContainer}>
+                <button onClick={() => { setView('home'); setShowAdmin(false); }} style={styles.backBtn}>
+                  <ChevronLeft /> Back
+                </button>
+                
+                <div style={styles.playerLayout}>
+                  <div style={styles.videoSection}>
+                    <iframe width="100%" height="480" 
+                      src={`https://www.youtube.com/embed/${getYouTubeId(currentSong.audioUrl)}?autoplay=1&loop=${isLooping === 'one' ? 1 : 0}&playlist=${getYouTubeId(currentSong.audioUrl)}`} 
+                      frameBorder="0" allowFullScreen style={{ borderRadius: '15px' }} 
+                      title="YouTube player">
+                    </iframe>
+                  </div>
+                  
+                  <div style={styles.detailsSection}>
+                    <img src={currentSong.albumArtUrl} style={styles.bigArt} alt="cover" />
+                    <h1 style={{marginTop: '20px'}}>{currentSong.title}</h1>
+                    <div style={{color: '#b3b3b3', fontSize: '14px'}}>{currentSong.artist}</div>
+                    
+                    <div style={styles.controlsRow}>
+                      <button onClick={() => setIsShuffle(!isShuffle)} style={{...styles.iconBtn, color: isShuffle ? '#1DB954' : 'white'}}>
+                        <Shuffle size={24} />
+                      </button>
+                      
+                      <SkipBack size={32} fill="white" onClick={() => skipSong('prev')} style={{cursor:'pointer'}}/>
+                      
+                      <div style={styles.playCircle}>
+                        <Play size={24} fill="black" />
+                      </div>
+                      
+                      <SkipForward size={32} fill="white" onClick={() => skipSong('next')} style={{cursor:'pointer'}}/>
+                      
+                      <button onClick={() => setIsLooping(isLooping === 'none' ? 'all' : isLooping === 'all' ? 'one' : 'none')} 
+                              style={{...styles.iconBtn, color: isLooping !== 'none' ? '#1DB954' : 'white'}}>
+                        <Repeat size={24} />
+                        {isLooping === 'one' && <span style={styles.repeatOneBadge}>1</span>}
+                      </button>
+                    </div>
+                    
+                    <div style={styles.largeVisualizer}>
+                      {[...Array(24)].map((_, i) => (
+                        <div key={i} className="bar" style={{ 
+                          width: '5px', 
+                          background: '#1DB954', 
+                          borderRadius: '3px', 
+                          animation: `bounce 0.4s infinite alternate ${i * 0.04}s` 
+                        }} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* ✅ PHASE 3: RECOMMENDATIONS */}
+                <div style={{marginTop: '40px'}}>
+                  <Recommendations 
+                    currentSong={currentSong} 
+                    onSelectSong={(song) => {
+                      playSong(song);
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </>
         )}
 
@@ -704,61 +780,6 @@ function App() {
                 <button onClick={() => setShowShareModal(false)} style={{...styles.shareBtn, background: '#ff4d4d'}}>
                   Close
                 </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {view === 'playing' && currentSong && (
-          <div style={styles.playingContainer}>
-            <button onClick={() => setView('home')} style={styles.backBtn}>
-              <ChevronLeft /> Back
-            </button>
-            
-            <div style={styles.playerLayout}>
-              <div style={styles.videoSection}>
-                <iframe width="100%" height="480" 
-                  src={`https://www.youtube.com/embed/${getYouTubeId(currentSong.audioUrl)}?autoplay=1&loop=${isLooping === 'one' ? 1 : 0}&playlist=${getYouTubeId(currentSong.audioUrl)}`} 
-                  frameBorder="0" allowFullScreen style={{ borderRadius: '15px' }} 
-                  title="YouTube player">
-                </iframe>
-              </div>
-              
-              <div style={styles.detailsSection}>
-                <img src={currentSong.albumArtUrl} style={styles.bigArt} alt="cover" />
-                <h1 style={{marginTop: '20px'}}>{currentSong.title}</h1>
-                <div style={{color: '#b3b3b3', fontSize: '14px'}}>{currentSong.artist}</div>
-                
-                <div style={styles.controlsRow}>
-                  <button onClick={() => setIsShuffle(!isShuffle)} style={{...styles.iconBtn, color: isShuffle ? '#1DB954' : 'white'}}>
-                    <Shuffle size={24} />
-                  </button>
-                  
-                  <SkipBack size={32} fill="white" onClick={() => skipSong('prev')} style={{cursor:'pointer'}}/>
-                  
-                  <div style={styles.playCircle}>
-                    <Play size={24} fill="black" />
-                  </div>
-                  
-                  <SkipForward size={32} fill="white" onClick={() => skipSong('next')} style={{cursor:'pointer'}}/>
-                  
-                  <button onClick={() => setIsLooping(isLooping === 'none' ? 'all' : isLooping === 'all' ? 'one' : 'none')} 
-                          style={{...styles.iconBtn, color: isLooping !== 'none' ? '#1DB954' : 'white'}}>
-                    <Repeat size={24} />
-                    {isLooping === 'one' && <span style={styles.repeatOneBadge}>1</span>}
-                  </button>
-                </div>
-                
-                <div style={styles.largeVisualizer}>
-                  {[...Array(24)].map((_, i) => (
-                    <div key={i} className="bar" style={{ 
-                      width: '5px', 
-                      background: '#1DB954', 
-                      borderRadius: '3px', 
-                      animation: `bounce 0.4s infinite alternate ${i * 0.04}s` 
-                    }} />
-                  ))}
-                </div>
               </div>
             </div>
           </div>
@@ -1145,39 +1166,6 @@ const styles = {
     ':hover': {
       opacity: 1
     }
-  },
-  // ✅ ADMIN DASHBOARD STYLES
-  adminContainer: {
-    padding: '20px',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    borderRadius: '15px',
-    color: 'white',
-    animation: 'fadeIn 0.6s ease'
-  },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-    margin: '20px 0'
-  },
-  statCard: {
-    background: 'rgba(255, 255, 255, 0.1)',
-    padding: '20px',
-    borderRadius: '10px',
-    textAlign: 'center',
-    backdropFilter: 'blur(10px)'
-  },
-  statNumber: {
-    fontSize: '2.5rem',
-    fontWeight: 'bold',
-    margin: '10px 0'
-  },
-  adminSection: {
-    background: 'rgba(255, 255, 255, 0.1)',
-    padding: '15px',
-    borderRadius: '10px',
-    margin: '20px 0',
-    backdropFilter: 'blur(10px)'
   }
 };
 
