@@ -110,3 +110,10 @@ select u1_0.id,u1_0.bio,u1_0.created_at,u1_0.email,u1_0.full_name,u1_0.is_active
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.music.musicapp.MusicappApplication.main(MusicappApplication.java:13)
+2026-01-13 02:47:48.658712+05:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]DESCRIBE PASSWORD_RESET_TOKENS"; expected "DELETE, DROP"; SQL statement:
+DESCRIBE PASSWORD_RESET_TOKENS [42001-232]
+2026-01-13 02:48:38.223852+05:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CONSTRAINTS" not found; SQL statement:
+SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS 
+WHERE TABLE_NAME = 'PASSWORD_RESET_TOKENS' [42102-232]

@@ -9,12 +9,13 @@ import {
   ChevronLeft, Repeat, SkipForward, SkipBack, Share2, 
   AlignLeft, History, Trash2, Settings, Save, MoreVertical, 
   Radio, Info, Monitor, Disc, UserCircle, Shuffle, Layout, 
-  MinusCircle, Edit, Copy, ExternalLink, BarChart3
+  MinusCircle, Edit, Copy, ExternalLink, BarChart3, Key
 } from 'lucide-react';
 
 // ✅ PHASE 2 & 3 IMPORTS
 import AdminDashboard from './components/AdminDashboard';
 import Recommendations from './components/Recommendations';
+import ForgotPassword from './components/ForgotPassword'; // ✅ NEW IMPORT
 
 function App() {
   const [query, setQuery] = useState('');
@@ -46,6 +47,9 @@ function App() {
   
   // ✅ Auth Form state management
   const [authForm, setAuthForm] = useState({ username: '', password: '', email: '' });
+  
+  // ✅ FORGOT PASSWORD STATE
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // ✅ HELPER FUNCTION: Authenticated API calls with JWT
   const fetchWithAuth = async (url, options = {}) => {
@@ -72,6 +76,7 @@ function App() {
       setView('home');
       setActivePlaylistId(null);
       setShowAdmin(false);
+      setShowForgotPassword(false); // Reset forgot password view
     } catch (e) { console.log("Load error"); }
   };
 
@@ -186,8 +191,19 @@ function App() {
   // ✅ handleRegister with validation
   const handleRegister = async () => {
     if(!authForm.username || !authForm.email || !authForm.password) {
-      return alert("Poora detail bhar!");
+      return alert("Please fill all details!");
     }
+    
+    // Email validation
+    if (!/\S+@\S+\.\S+/.test(authForm.email)) {
+      return alert("Please enter a valid email address!");
+    }
+    
+    // Password validation
+    if (authForm.password.length < 6) {
+      return alert("Password must be at least 6 characters!");
+    }
+    
     try {
       const res = await fetch(`http://localhost:8080/api/auth/register`, {
         method: 'POST',
@@ -196,17 +212,31 @@ function App() {
       });
       const result = await res.json();
       if (res.ok) { 
-        alert("Account ban gaya! Ab login kar le."); 
+        alert("Account created! Please login."); 
         setIsRegistering(false); 
         setAuthForm({ username: '', password: '', email: '' });
       } else { 
-        alert(result.message || "Registration fail! Email already exists."); 
+        alert(result.message || "Registration failed!"); 
       }
-    } catch (e) { alert("Backend is offline!"); }
+    } catch (e) { 
+      console.error("Registration error:", e);
+      alert("Server error. Please try again."); 
+    }
   };
 
   // ✅ UPDATED: handleLogin with JWT token handling
   const handleLogin = async () => {
+    // Client-side validation
+    if (!authForm.username.trim()) {
+      return alert("Username/Email is required!");
+    }
+    if (!authForm.password.trim()) {
+      return alert("Password is required!");
+    }
+    if (authForm.password.length < 6) {
+      return alert("Password must be at least 6 characters!");
+    }
+    
     try {
       const res = await fetch(`http://localhost:8080/api/auth/login`, {
         method: 'POST',
@@ -236,6 +266,7 @@ function App() {
         setCurrentSong(null);
         setView('home');
         setShowAdmin(false);
+        setShowForgotPassword(false);
         
         ensurePlaylistExists(user.id);
         fetchUserPlaylists(user.id);
@@ -247,11 +278,15 @@ function App() {
           setPlayHistory([]);
         }
         
+        // Clear auth form
+        setAuthForm({ username: '', password: '', email: '' });
+        
       } else { 
-        alert(result.message || "User nahi mila ya password galat!"); 
+        alert(result.message || "User not found or incorrect password!"); 
       }
     } catch (e) { 
-      alert("Backend band hai!"); 
+      console.error("Login error:", e);
+      alert("Server error. Please try again!"); 
     }
   };
 
@@ -267,6 +302,7 @@ function App() {
     setCurrentSong(null);
     setView('home');
     setShowAdmin(false);
+    setShowForgotPassword(false);
     window.location.reload(); 
   };
 
@@ -274,6 +310,7 @@ function App() {
     setCurrentSong(song);
     setView('playing');
     setShowAdmin(false);
+    setShowForgotPassword(false);
     const updatedHistory = [song, ...playHistory.filter(s => s.id !== song.id)].slice(0, 20);
     setPlayHistory(updatedHistory);
     
@@ -310,7 +347,7 @@ function App() {
   };
 
   const deletePlaylistHandler = async (pId) => {
-    if(!window.confirm("Bhai, pakka uda dun?")) return;
+    if(!window.confirm("Are you sure you want to delete this playlist?")) return;
     try {
       const response = await deletePlaylist(pId);
       if(response.data.status === "success") {
@@ -357,6 +394,7 @@ function App() {
         setView('playlist-view');
         setActivePlaylistId(playlistId);
         setShowAdmin(false);
+        setShowForgotPassword(false);
         
         if (songs.length > 0) {
           setTimeout(() => {
@@ -411,6 +449,7 @@ function App() {
       setView('search');
       setActivePlaylistId(null);
       setShowAdmin(false);
+      setShowForgotPassword(false);
     } catch (e) { alert("Search failed!"); }
   };
 
@@ -423,6 +462,7 @@ function App() {
         setActivePlaylistId(pId);
         setMenuOpen(null);
         setShowAdmin(false);
+        setShowForgotPassword(false);
       }
     } catch (e) { alert("Playlist empty!"); }
   };
@@ -473,24 +513,94 @@ function App() {
     }
     setShowAdmin(!showAdmin);
     setView('home');
+    setShowForgotPassword(false);
   };
 
+  // ✅ Show Forgot Password Screen
+  const showForgotPasswordScreen = () => {
+    setShowForgotPassword(true);
+  };
+
+  // ✅ Go Back to Login from Forgot Password
+  const goBackToLogin = () => {
+    setShowForgotPassword(false);
+    setAuthForm({ username: '', password: '', email: '' });
+  };
+
+  // =========================== RENDER LOGIC ===========================
+  
   if (!loggedInUser) {
+    // ✅ Show Forgot Password Screen
+    if (showForgotPassword) {
+      return <ForgotPassword onBackToLogin={goBackToLogin} />;
+    }
+    
+    // ✅ Show Login/Register Screen
     return (
       <div style={styles.authContainer}>
         <div style={styles.authCard}>
           <Music size={50} color="#1DB954" style={{ marginBottom: '20px' }} />
           <h2 style={{ marginBottom: '30px' }}>{isRegistering ? 'Sign up for free' : 'Log in to MusicApp'}</h2>
           
-          <input name="username" style={styles.authInput} placeholder="Username" value={authForm.username} onChange={handleAuthInputChange} />
-          {isRegistering && <input name="email" style={styles.authInput} placeholder="Email" value={authForm.email} onChange={handleAuthInputChange} />}
-          <input name="password" style={styles.authInput} type="password" placeholder="Password" value={authForm.password} onChange={handleAuthInputChange} />
+          <input 
+            name="username" 
+            style={styles.authInput} 
+            placeholder="Username or Email" 
+            value={authForm.username} 
+            onChange={handleAuthInputChange} 
+          />
           
-          <button style={styles.authBtn} onClick={isRegistering ? handleRegister : handleLogin}>
+          {isRegistering && (
+            <input 
+              name="email" 
+              style={styles.authInput} 
+              placeholder="Email" 
+              value={authForm.email} 
+              onChange={handleAuthInputChange} 
+            />
+          )}
+          
+          <input 
+            name="password" 
+            style={styles.authInput} 
+            type="password" 
+            placeholder="Password (min. 6 characters)" 
+            value={authForm.password} 
+            onChange={handleAuthInputChange} 
+          />
+          
+          <button 
+            style={styles.authBtn} 
+            onClick={isRegistering ? handleRegister : handleLogin}
+          >
             {isRegistering ? 'Sign Up' : 'Log In'}
           </button>
           
-          <p onClick={() => { setIsRegistering(!isRegistering); setAuthForm({username:'', email:'', password:''}); }} style={{ marginTop: '20px', fontSize: '14px', color: '#b3b3b3', cursor: 'pointer' }}>
+          {/* Forgot Password Link - Only show on login screen */}
+          {!isRegistering && (
+            <div style={styles.forgotPasswordContainer}>
+              <a 
+                href="#" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  showForgotPasswordScreen();
+                }}
+                style={styles.forgotPasswordLink}
+              >
+                <Key size={14} style={{ marginRight: '8px' }} />
+                Forgot your password?
+              </a>
+            </div>
+          )}
+          
+          <p 
+            onClick={() => { 
+              setIsRegistering(!isRegistering); 
+              setAuthForm({username:'', email:'', password:''}); 
+              setShowForgotPassword(false);
+            }} 
+            style={{ marginTop: '20px', fontSize: '14px', color: '#b3b3b3', cursor: 'pointer' }}
+          >
             {isRegistering ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
           </p>
         </div>
@@ -512,10 +622,10 @@ function App() {
           <div style={{...styles.navItem, color: view === 'home' && !showAdmin ? '#1DB954' : 'white'}} onClick={loadFeatured}>
             <Home size={22} /> Home
           </div>
-          <div style={{...styles.navItem, color: view === 'search' ? '#1DB954' : 'white'}} onClick={() => { setView('search'); setShowAdmin(false); }}>
+          <div style={{...styles.navItem, color: view === 'search' ? '#1DB954' : 'white'}} onClick={() => { setView('search'); setShowAdmin(false); setShowForgotPassword(false); }}>
             <Search size={22} /> Search
           </div>
-          <div style={{...styles.navItem, color: view === 'history' ? '#1DB954' : 'white'}} onClick={() => { setView('history'); setShowAdmin(false); }}>
+          <div style={{...styles.navItem, color: view === 'history' ? '#1DB954' : 'white'}} onClick={() => { setView('history'); setShowAdmin(false); setShowForgotPassword(false); }}>
             <History size={22} /> History
           </div>
           
@@ -663,16 +773,22 @@ function App() {
 
             {view === 'playing' && currentSong && (
               <div style={styles.playingContainer}>
-                <button onClick={() => { setView('home'); setShowAdmin(false); }} style={styles.backBtn}>
+                <button onClick={() => { setView('home'); setShowAdmin(false); setShowForgotPassword(false); }} style={styles.backBtn}>
                   <ChevronLeft /> Back
                 </button>
                 
                 <div style={styles.playerLayout}>
                   <div style={styles.videoSection}>
-                    <iframe width="100%" height="480" 
+                    <iframe 
+                      width="100%" 
+                      height="480" 
                       src={`https://www.youtube.com/embed/${getYouTubeId(currentSong.audioUrl)}?autoplay=1&loop=${isLooping === 'one' ? 1 : 0}&playlist=${getYouTubeId(currentSong.audioUrl)}`} 
-                      frameBorder="0" allowFullScreen style={{ borderRadius: '15px' }} 
-                      title="YouTube player">
+                      frameBorder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowFullScreen 
+                      style={{ borderRadius: '15px' }} 
+                      title="YouTube player"
+                    >
                     </iframe>
                   </div>
                   
@@ -819,7 +935,8 @@ const styles = {
     border: 'none', 
     color: '#fff', 
     marginBottom: '15px', 
-    outline: 'none' 
+    outline: 'none',
+    fontSize: '14px'
   },
   authBtn: { 
     width: '100%', 
@@ -830,7 +947,30 @@ const styles = {
     borderRadius: '30px', 
     fontWeight: 'bold', 
     cursor: 'pointer', 
-    fontSize: '16px' 
+    fontSize: '16px',
+    transition: '0.2s',
+    ':hover': {
+      opacity: 0.9,
+      transform: 'translateY(-2px)'
+    }
+  },
+  forgotPasswordContainer: {
+    marginTop: '15px',
+    textAlign: 'center'
+  },
+  forgotPasswordLink: {
+    color: '#1DB954',
+    fontSize: '14px',
+    textDecoration: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    cursor: 'pointer',
+    transition: '0.2s',
+    ':hover': {
+      textDecoration: 'underline'
+    }
   },
   container: { 
     backgroundColor: '#000', 

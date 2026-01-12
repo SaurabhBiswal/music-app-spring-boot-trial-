@@ -2,7 +2,9 @@ package com.music.musicapp.repository;
 
 import com.music.musicapp.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +23,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Check if email exists
     boolean existsByEmail(String email);
     
-    // Find by username or email (for login)
+    // ✅ FIXED: Method with TWO parameters (username, email)
+    @Query("SELECT u FROM User u WHERE u.username = ?1 OR u.email = ?2")
     Optional<User> findByUsernameOrEmail(String username, String email);
+    
+    // ✅ Optional: Method with ONE parameter (username or email)
+    @Query("SELECT u FROM User u WHERE u.username = ?1 OR u.email = ?1")
+    Optional<User> findByUsernameOrEmail(String identifier);
+    
+    // Get recent users
     List<User> findTop5ByOrderByIdDesc();
 }
