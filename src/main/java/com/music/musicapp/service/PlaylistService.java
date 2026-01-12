@@ -36,7 +36,7 @@ public class PlaylistService {
     return playlistRepository.findByUserId(userId).stream()
         .map(this::convertToDTO)
         .collect(Collectors.toList());
-}
+    }
     // Get all public playlists
     public List<PlaylistDTO> getAllPublicPlaylists() {
         return playlistRepository.findByIsPublicTrue().stream()
@@ -61,7 +61,32 @@ public class PlaylistService {
         
         return convertToDTO(playlist);
     }
+    // PlaylistService.java ke end mein (addExternalSongToPlaylist ke baad) yeh method add karo:
+
+@Transactional
+public PlaylistDTO renamePlaylist(Long id, String newName, Long userId) {
+    Optional<Playlist> playlistOpt = playlistRepository.findById(id);
     
+    if (playlistOpt.isEmpty()) {
+        throw new RuntimeException("Playlist not found with ID: " + id);
+    }
+    
+    Playlist playlist = playlistOpt.get();
+    
+    // Check ownership (if userId provided)
+    if (userId != null && playlist.getUser() != null && 
+        !playlist.getUser().getId().equals(userId)) {
+        throw new RuntimeException("Not authorized to rename this playlist");
+    }
+    
+    playlist.setName(newName);
+    playlist.setUpdatedAt(LocalDateTime.now());
+    Playlist updatedPlaylist = playlistRepository.save(playlist);
+    
+    return convertToDTO(updatedPlaylist);
+}
+
+
     // Create a new playlist
     @Transactional
     public PlaylistDTO createPlaylist(String name, String description, boolean isPublic, Long userId) {

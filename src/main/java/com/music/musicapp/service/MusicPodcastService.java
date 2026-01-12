@@ -13,7 +13,13 @@ public class MusicPodcastService {
     @Autowired
     private PodcastService podcastService;
     
+    // Method 1: WITHOUT userId (Controller ke liye compatible)
     public Map<String, Object> searchAll(String query, int limit) {
+        return searchAll(query, limit, null);
+    }
+    
+    // Method 2: WITH userId (overloaded version)
+    public Map<String, Object> searchAll(String query, int limit, Long userId) {
         Map<String, Object> result = new HashMap<>();
         
         // Search music
@@ -30,13 +36,51 @@ public class MusicPodcastService {
         result.put("podcasts", podcastResults);
         result.put("musicCount", musicResults.size());
         result.put("podcastCount", podcastResults.size());
+        result.put("userId", userId);
         result.put("timestamp", new Date());
         result.put("status", "success");
         
         return result;
     }
     
+    public Map<String, Object> getUserRecommendations(Long userId) {
+        Map<String, Object> recommendations = new HashMap<>();
+        
+        // Dummy recommendations based on user ID
+        if (userId != null) {
+            recommendations.put("personalized", true);
+            recommendations.put("userId", userId);
+            
+            // Mock personalized recommendations
+            List<Map<String, Object>> recommendedMusic = new ArrayList<>();
+            recommendedMusic.add(createItem("rec1", "Your Favorite Genre", "Personalized", "music", "❤️"));
+            recommendedMusic.add(createItem("rec2", "Based on History", "AI Picks", "music", "🤖"));
+            
+            recommendations.put("music", recommendedMusic);
+            
+            // Podcast recommendations
+            List<Map<String, Object>> recommendedPodcasts = podcastService.searchPodcasts("your interests", 3);
+            recommendations.put("podcasts", recommendedPodcasts);
+            
+        } else {
+            recommendations.put("personalized", false);
+            recommendations.put("music", musicApiService.searchMusic("trending"));
+            recommendations.put("podcasts", podcastService.searchPodcasts("popular", 3));
+        }
+        
+        recommendations.put("timestamp", new Date());
+        recommendations.put("status", "success");
+        
+        return recommendations;
+    }
+    
+    // Method 1: WITHOUT userId
     public Map<String, Object> getHomeData() {
+        return getHomeData(null);
+    }
+    
+    // Method 2: WITH userId (overloaded version)
+    public Map<String, Object> getHomeData(Long userId) {
         Map<String, Object> data = new HashMap<>();
         
         // Featured music
@@ -58,6 +102,14 @@ public class MusicPodcastService {
             data.put("categories", podcastService.getPodcastCategories());
         } catch (Exception e) {
             data.put("categories", getDefaultCategories());
+        }
+        
+        // Add userId if provided
+        if (userId != null) {
+            data.put("userId", userId);
+            data.put("personalized", true);
+        } else {
+            data.put("personalized", false);
         }
         
         data.put("status", "success");
