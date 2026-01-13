@@ -3,7 +3,7 @@
 A production-ready music streaming application built with Java Spring Boot and React, featuring user authentication, playlist management, and audio streaming capabilities.
 
 ## 🚀 Live Deployment
-- **Application:** eloquent-souffle-13cf7e.netlify.app
+- **Application:** https://eloquent-souffle-13cf7e.netlify.app
 -  https://starlit-lolly-c5ae35.netlify.app
 - **Backend API:** https://mega-project-2-musicapp-production.up.railway.app
 - **Health Check:** https://mega-project-2-musicapp-production.up.railway.app/api/auth/health
