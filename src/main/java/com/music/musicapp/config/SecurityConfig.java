@@ -19,17 +19,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors().and()
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Naya Lambda style syntax
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/**").permitAll()
-                .requestMatchers("/static/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll() // Sabse pehle auth allow karo
+                .requestMatchers("/api/**").permitAll() 
                 .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().permitAll()
             )
-            .headers().frameOptions().disable(); // For H2 console
+            .headers(headers -> headers.frameOptions(frame -> frame.disable())); // H2 Console fix
         
         return http.build();
     }
@@ -37,10 +36,20 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://mega-project-2-musicapp-production.up.railway.app"));
+        
+        // ✅ YAHAN HAI FIX: Netlify ka link add kar diya hai
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000", 
+            "https://starlit-lolly-c5ae35.netlify.app" 
+        ));
+        
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        
+        // ✅ Authorization header allow karna zaroori hai JWT ke liye
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
+        
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Preflight request cache karne ke liye
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
