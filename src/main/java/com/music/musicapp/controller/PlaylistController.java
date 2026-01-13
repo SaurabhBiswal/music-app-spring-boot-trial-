@@ -118,7 +118,7 @@ public ResponseEntity<ApiResponse> getPlaylistShareInfo(@PathVariable Long id) {
         shareInfo.put("createdBy", playlist.getUsername() != null ? playlist.getUsername() : "Anonymous");
         
         // ✅ FIXED: Frontend URL use karo (localhost:3000)
-        String frontendUrl = "http://localhost:3000";
+        String frontendUrl = "https://starlit-lolly-c5ae35.netlify.app";
         String shareUrl = frontendUrl + "/playlist/" + playlist.getId();
         
         shareInfo.put("shareUrl", shareUrl);
